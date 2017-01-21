@@ -1,0 +1,20 @@
+{
+  "name": "journal_analyzer",
+  "version": "1.0.0",
+  "description": "journaling app with NLP-derived \"topic\" analysis",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.14.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.2.0"
+  },
+  "scripts": {
+    "test": "mocha ./test",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
