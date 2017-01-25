@@ -11,48 +11,74 @@ const {app} = require('../server');
 
 chai.use(chaiHttp);
 
-describe('Server', function() {
-    describe('GET endpoint', function() {
+describe('Pages', function() {
+    describe('index.html', function() {
+        let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
                 .get('/')
-                .then((res) => res.should.have.status(200));
+                .then((res_) => {
+                    res = res_;
+                    res.should.have.status(200) });
+        });
+        it('should return html', function() {
+            res.should.be.html;
         });
     });
-});
 
-describe('Pages', function() {
-    describe('Text entry page', function() {
+    describe('Text entry page (entry.html)', function() {
+        let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
                 .get('/entry.html')
-                .then((res) => res.should.have.status(200));
+                .then((res_) => {
+                    res = res_;
+                    res.should.have.status(200)});
+        });
+        it('should return html', function() {
+            res.should.be.html;
         });
     });
 
     describe('Editing page', function() {
+        let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
                 .get('/edit.html')
-                .then((res) => res.should.have.status(200));
+                .then((res_) => {
+                    res = res_;
+                    res.should.have.status(200)});
+        });
+        it('should return html', function() {
+            res.should.be.html;
         });
     });
 
     describe('Entry listings page', function() {
+        let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
                 .get('/listings.html')
-                .then((res) => res.should.have.status(200));
+                .then((res_) => {
+                    res = res_;
+                    res.should.have.status(200)});
+        });
+        it('should return html', function() {
+            res.should.be.html;
         });
     });
 
     describe('Listings analysis page', function() {
+        let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
                 .get('/analysis.html')
-                .then((res) => res.should.have.status(200));
+                .then((res_) => {
+                    res = res_;
+                    res.should.have.status(200)});
+        });
+        it('should return html', function() {
+            res.should.be.html;
         });
     });
-
-
 });
