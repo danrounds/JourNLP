@@ -26,11 +26,11 @@ describe('Pages', function() {
         });
     });
 
-    describe('Text entry page (entry.html)', function() {
+    describe('Text entry page (write-entry.html)', function() {
         let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
-                .get('/entry.html')
+                .get('/write-entry.html')
                 .then((res_) => {
                     res = res_;
                     res.should.have.status(200)});
@@ -40,7 +40,7 @@ describe('Pages', function() {
         });
     });
 
-    describe('Editing page', function() {
+    describe('Entry-view page (view-entry.html)', function() {
         let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
@@ -54,7 +54,7 @@ describe('Pages', function() {
         });
     });
 
-    describe('Entry listings page', function() {
+    describe('Entries lists page', function() {
         let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
