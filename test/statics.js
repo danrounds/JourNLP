@@ -44,7 +44,7 @@ describe('Pages', function() {
         let res;
         it('should return a 200 status code', function() {
             return chai.request(app)
-                .get('/edit.html')
+                .get('/view-entry.html')
                 .then((res_) => {
                     res = res_;
                     res.should.have.status(200)});
