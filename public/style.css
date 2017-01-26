@@ -4,7 +4,7 @@ html, body, .container {
     padding: 0;
 }
 
-.sidebar, .tagsbar {
+.sidebar, .tags-bar {
     background-color: #eee;
 }
 
@@ -17,16 +17,16 @@ html, body, .container {
     width: 250px;
 }
 
-.listings {
+.listings-link {
     font-size: 24px;
 }
 
-.sidebar-listing {
+.sidebar-entry {
     padding-top: 20px;
     padding-bottom: 20px;
 }
 
-.tagsbar {
+.tags-bar {
     position: absolute;
     right: 0;
     top: 0;
@@ -34,7 +34,7 @@ html, body, .container {
     width: 275px;
 }
 
-.tags {
+.tags-text {
     margin-top: 200px;
 }
 
