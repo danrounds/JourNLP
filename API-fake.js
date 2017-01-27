@@ -17,8 +17,8 @@ function makeEntry() {
             Fake.lorem.paragraph() + '\n\n',
         author: Fake.internet.userName(),
         NlpTopics: Fake.random.words(8),
-        publishedAt: Fake.date.past(),
-        lastupdatedAt: Fake.date.future()
+        publishedAt: Fake.date.past()
+        // lastupdatedAt: Fake.date.future()
     };
     return entryInstance;
 }
@@ -37,8 +37,15 @@ function initData() {
     return entries;
 }
 
-const entries = initData();
-// console.log(entries);
+function create(obj) {
+    obj.id = Fake.random.uuid();
+    obj.publishedAt = Fake.date.future();
+    obj.NlpTopics = Fake.random.words(8);
+    obj.publishedAt = Fake.date.past();
+
+    entries.unshift(obj);
+    return Promise.resolve(obj);
+}
 
 function find() {
     return Promise.resolve(entries);
@@ -52,10 +59,24 @@ function findById(id) {
     return Promise.resolve(entry);
 }
 
+function findByIdAndRemove(id) {
+    let entry = entries.filter(function(obj) {
+        return obj.id == id;
+    })[0];
+
+    entries.splice( entries.indexOf(entry), 1 );
+    return Promise.resolve();
+}
+
+const entries = initData();
+// console.log(entries);
+
 const Entries = {
+    create: create,
     entries: entries,
     find: find,
-    findById: findById
+    findById: findById,
+    findByIdAndRemove: findByIdAndRemove
 };
 
 module.exports = {Entries};
