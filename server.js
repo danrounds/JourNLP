@@ -13,14 +13,22 @@ app.get('/api/entries', (req, res) => {
     Entries
         .find()
         .exec()
-        .then(entries => res.json(entries));
+        .then(entries => res.json(entries))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: 'something went wrong'});
+        });
 });
 
 app.get('/api/entries/:id', (req, res) => {
     Entries
         .findById(req.params.id)
         .exec()
-        .then(entry => res.json(entry));
+        .then(entry => res.json(entry))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: 'something went wrong'});
+        });
 });
 
 module.exports = {app};
