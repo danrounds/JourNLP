@@ -52,7 +52,6 @@ function find() {
 }
 
 function findById(id) {
-    // returns an array of one element. Not sure whether that's good or not.
     let entry = entries.filter(function(obj) {
         return obj.id == id;
     })[0];
@@ -68,6 +67,15 @@ function findByIdAndRemove(id) {
     return Promise.resolve();
 }
 
+function findByIdAndUpdate(id, $set, nothing) {
+    let entry = entries.filter(function(obj) {
+        return obj.id == id;
+    })[0];
+
+    Object.assign(entry, $set.$set);
+    return Promise.resolve(entry);
+}
+
 const entries = initData();
 // console.log(entries);
 
@@ -76,7 +84,8 @@ const Entries = {
     entries: entries,
     find: find,
     findById: findById,
-    findByIdAndRemove: findByIdAndRemove
+    findByIdAndRemove: findByIdAndRemove,
+    findByIdAndUpdate: findByIdAndUpdate
 };
 
 module.exports = {Entries};

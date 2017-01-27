@@ -52,6 +52,31 @@ app.post('/api/entries/', (req, res) => {
         });
 });
 
+app.put('/api/entries/:id', (req, res) => {
+    // if (!Entries.findById(req.params.id)) {
+    //     res.status(400).json({ error: 'Requested entry id does not exist'});
+    // }
+
+    if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+        res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
+    }
+
+    const updated = {};
+    const updateableFields = ['title', 'body', 'author'];
+    // we'll make the client send all three of these values, but API users needn't
+    updateableFields.forEach(field => {
+        if (field in req.body) {
+            updated[field] = req.body[field];
+        }
+    });
+
+    Entries
+        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
+        .exec()
+        .then(updatedPost => res.status(201).json(updatedPost))
+        .catch(err => res.status(500).json({message: 'Something went wrong'}));
+});
+
 app.delete('/api/entries/:id', (req, res) => {
     Entries
         .findByIdAndRemove(req.params.id)
