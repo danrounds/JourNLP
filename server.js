@@ -53,13 +53,13 @@ app.post('/api/entries/', (req, res) => {
 });
 
 app.put('/api/entries/:id', (req, res) => {
-    // if (!Entries.findById(req.params.id)) {
-    //     res.status(400).json({ error: 'Requested entry id does not exist'});
-    // }
-
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
     }
+
+    // if (!Entries.findById(req.params.id)) {
+    //     res.status(400).json({ error: 'Requested entry id does not exist'});
+    // }
 
     const updated = {};
     const updateableFields = ['title', 'body', 'author'];
@@ -86,6 +86,10 @@ app.delete('/api/entries/:id', (req, res) => {
             console.error(err);
             res.status(500).json({error: 'Something went wrong'});
         });
+});
+
+app.use('*', function(req, res) {
+    res.status(404).json({message: 'Resource not found'});
 });
 
 module.exports = {app};
