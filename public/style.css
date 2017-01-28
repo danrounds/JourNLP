@@ -1,0 +1,57 @@
+html, body, .container {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar, .tags-bar {
+    background-color: #eee;
+}
+
+.sidebar {
+    padding: 10px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 250px;
+}
+
+.listings-link {
+    font-size: 24px;
+}
+
+.sidebar-entry {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.tags-bar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 275px;
+}
+
+.tags-text {
+    margin-top: 200px;
+}
+
+.text-entry, entry-display, entries-list {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 57%;
+    padding-top: 30px;
+}
+
+.text-entry, .entry-display {
+    position: absolute;
+    left: 275px;
+}
+
+.entries-list {
+    position: absolute;
+    left: 150px;
+}
