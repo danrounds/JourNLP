@@ -1,9 +1,11 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
 
 const {Entries} = require('./API-fake.js');
 
+app.use(morgan('common'));
 app.use(bodyParser.json());
 
 app.use(express.static('public')); // /public now serves static files
