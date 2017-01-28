@@ -159,10 +159,23 @@ function writeEditDisplayMain() {
     }
 }
 function writeEditButtons() {
+    var ans;
+
+    // var initialTitle = $('#title-text').val();
+    // var initialBody = $('body-text').val();
+
+    // $('a').click(function(e) {
+    //     e.preventDefault();
+    //     if (initialTitle !== $('#title-text') || initialBody !== $('#body-text')) {
+    //         ans = confirm('You\'re sure you don\'t want to save your changes?');
+    //     }
+    //     if (ans) { return true; } else { return false; }
+    // });
+
     $('button#discard').click(function(e) {
         e.preventDefault();
         if ($('#title-text').val().length !== 0 || $('#body-text').val().length !== 0) {
-            var ans = confirm('Are you sure you want to discard your entry?');
+            ans = confirm('Are you sure you want to discard your entry?');
             if (ans) {
                 window.open('write-entry.html', '_self');
             }
