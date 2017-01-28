@@ -1,25 +1,13 @@
 'use strict';
 
-
 // state-oriented functions & data-structures
 var state = {
     entries: [],
-    current: null
-};
-
-function populateState() {
-    if (!state.entries.length) {
-        // If our state isn't populated, we get data via API
-        // return getEntries().
-        return $.getJSON('../api/entries')
-            .done(function(data) {
-                state.entries = data;
-                state.current = data[0];
-            });
+    current: null,
+    resetCurrent: function() {
+        state.current = state.entries[0];
     }
-    return $.Deferred().resolve(state);
-    // lets us use the same interface, whether our data are async or synchronous
-}
+};
 
 function findById(id) {
     let entry = state.entries.filter(function(obj) {
@@ -38,6 +26,14 @@ function findByIdAndRemove(id) {
 
 
 //// API-access functions
+function populateState() {
+    return $.getJSON('../api/entries')
+        .done(function(data) {
+            state.entries = data;
+            state.resetCurrent();
+        });
+}
+
 function submitEntry(data) {
     return $.post(
         { url: '../api/entries',
@@ -71,7 +67,8 @@ function deleteEntry(id) {
     });
 }
 
-////
+
+//// Page updating functions (HTML and event handlers)
 function updateEntriesSidebar() {
     $('.sidebar').text('');
     state.entries.forEach(function(ent) {
@@ -88,10 +85,12 @@ function updateEntriesSidebar() {
 function updateTagsSidebar() {
     $('.tags-text').text('tags: ' + state.current.NlpTopics);
 }
-////
 
 ////
-function addEntriesButtonsProperties(id, title) {
+function addListingsButtonsProperties(id, title) {
+    // this adds properties to the individual entries on our entries screen
+    //  (listings.html)
+
     // view button
     $('#view_'+id).click(function() {
         window.open(`view-entry.html?${id}`, '_self');
@@ -105,18 +104,20 @@ function addEntriesButtonsProperties(id, title) {
     // delete button
     $('#del_'+id).click(function() {
         var answer = confirm(`Are you sure you wanna delete "${title}"?`);
-        deleteEntry(id)
-            .catch(function() { window.open('listings.html', '_self') });
-        // this isn't especially robust error handling; it just reloads the
-        // page if the deletion fails. I suppose so that the page reflects the
-        // server's state
+        if (answer) {
+            deleteEntry(id)
+                .catch(function() { window.open('listings.html', '_self') });
+            // this isn't especially robust error handling; it just reloads the
+            // page if the deletion fails. I suppose so that the page reflects the
+            // server's state
 
-        findByIdAndRemove(id);
-        updateEntriesView();
+            findByIdAndRemove(id);
+            updateListingsView();
+        }
     });
 }
 
-function updateEntriesView() {
+function updateListingsView() {
     $('.tags-text').text('HERE YOU NEED A FUNCTION TO GET THE GLOBAL TAGS');
     $('.entries-list').text('');
     state.entries.forEach(function(ent) {
@@ -130,7 +131,7 @@ function updateEntriesView() {
                 + `<button id="${'view_'+id}">view</button>`
                 + `<button id="${'edit_'+id}">edit</button>`
                 + `<button id="${'del_'+id}">delete</button><br/><br/>`);
-        addEntriesButtonsProperties(id, title);
+        addListingsButtonsProperties(id, title);
     });
 }
 
@@ -152,7 +153,7 @@ function writeEditDisplayMain() {
     if (!current) {
         $('h1').text('write an entry');
     } else {
-        $('h1').text('edit an entry')
+        $('h1').text('edit an entry');
         $('#title-text').val(current.title);
         $('#body-text').val(current.body);
     }
@@ -161,7 +162,11 @@ function writeEditButtons() {
     $('button#discard').click(function(e) {
         e.preventDefault();
         if ($('#title-text').val().length !== 0 || $('#body-text').val().length !== 0) {
-            confirm('Are you sure you want to discard your entry?'); }
+            var ans = confirm('Are you sure you want to discard your entry?');
+            if (ans) {
+                window.open('write-entry.html', '_self');
+            }
+        }
     });
 
     $('button#save').click(function(e) {
@@ -171,20 +176,20 @@ function writeEditButtons() {
         if (title.length === 0) { alert('Your entry needs a title'); }
         else if (body.length === 0) { alert('Your entry needs an actual body'); }
 
-        else {
+        else {                  // we have an actual entry to submit
             var id = queryStringId();
             if (id) {
                 editEntry({id: id, title: title, body: body});
             } else {
+                id = '';
                 submitEntry({title: title, body: body});
-                id = state.current.id;
             }
             window.open(`view-entry.html?${id}`, '_self');
         }
     });
 }
 
-/////////////
+//// high-level functions for our different screens
 function viewEntryUpdate() {
     populateState()
         .then(updateEntriesSidebar)
@@ -202,7 +207,7 @@ function writeEntryUpdate() {
 
 function listingsUpdate() {
     populateState()
-        .then(updateEntriesView);
+        .then(updateListingsView);
 }
 
 function dispatch() {
