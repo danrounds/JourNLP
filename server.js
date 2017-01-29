@@ -140,5 +140,6 @@ if (require.main === module) {
 }
 
 // we export runServer and closeServer so that other code (right now, just
-// tests) can start/close the server
+// tests) can start/close the server, at will. Our db-oriented test will need
+// to start & close, over and over.
 module.exports = {runServer, closeServer, app};
