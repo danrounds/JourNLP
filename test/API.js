@@ -29,8 +29,7 @@ function initNotesData() {
 
 // Faker makes us some nice-looking fake journal entries
 function generateEntry() {
-    const entryInstance = {
-        id: faker.random.uuid(),
+    return  {
         title: faker.random.words(4),
         body: faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n' +
@@ -45,7 +44,6 @@ function generateEntry() {
         publishedAt: faker.date.past()
         // lastupdatedAt: faker.date.future()
     };
-    return entryInstance;
 }
 
 function tearDownDb() {
@@ -117,7 +115,7 @@ describe('Journal/notes entries API endpoints', function() {
                     });
                     resEntry = res.body[0];
                     // \/ look up db entry that corresponds with response[0]
-                    return Entries.findById(resEntry);
+                    return Entries.findById(resEntry.id);
                 })
                 .then(entryRecord => {
                     resEntry.id.should.equal(entryRecord.id);

@@ -19,7 +19,9 @@ app.get('/api/entries', (req, res) => {
     Entries
         .find()
         .exec()
-        .then(entries => res.json(entries))
+        .then(entries => {
+            res.json(entries.map(entry => entry.apiRepr()));
+        })
         .catch(err => {
             console.error(err);
             res.status(500).json({error: 'something went wrong'});
