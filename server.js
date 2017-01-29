@@ -20,6 +20,8 @@ app.get('/api/entries', (req, res) => {
         .find()
         .exec()
         .then(entries => {
+            console.log('COME ONE!!!');
+            console.log(entries);
             res.json(entries.map(entry => entry.apiRepr()));
         })
         .catch(err => {
@@ -32,7 +34,7 @@ app.get('/api/entries/:id', (req, res) => {
     Entries
         .findById(req.params.id)
         .exec()
-        .then(entry => res.json(entry))
+        .then(entry => res.json(entry.apiRepr()))
         .catch(err => {
             console.error(err);
             res.status(500).json({error: 'something went wrong'});
@@ -53,7 +55,7 @@ app.post('/api/entries/', (req, res) => {
             body: req.body.body,
             author: req.body.author
         })
-        .then(entry => res.status(201).json(entry))
+        .then(entry => res.status(201).json(entry.apiRepr()))
         .catch(err => {
             console.error(err);
             res.status(500).json({error: 'Something went wrong'});
@@ -81,7 +83,7 @@ app.put('/api/entries/:id', (req, res) => {
     Entries
         .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
         .exec()
-        .then(updatedPost => res.status(201).json(updatedPost))
+        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
         .catch(err => res.status(500).json({message: 'Something went wrong'}));
 });
 
