@@ -31,7 +31,7 @@ function initNotesData() {
 function generateEntry() {
     const entryInstance = {
         id: faker.random.uuid(),
-        title: faker(faker.random.words(4)),
+        title: faker.random.words(4),
         body: faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n' +
@@ -106,8 +106,8 @@ describe('Journal/notes entries API endpoints', function() {
             return chai.request(app)
                 .get('/api/entries')
                 .then(res => {
-                    res.should.be.json
-                    res.body.should.be.a('array')
+                    res.should.be.json;
+                    res.body.should.be.a('array');
                     res.body.should.have.length.of.at.least(1);
 
                     res.body.forEach(entry => {
@@ -127,5 +127,5 @@ describe('Journal/notes entries API endpoints', function() {
                     resEntry.NlpTopics.should.equal(entryRecord.NlpTopics);
                 });
         });
-
+    });
 });

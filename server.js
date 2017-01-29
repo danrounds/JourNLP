@@ -5,15 +5,15 @@ const morgan = require('morgan');
 
 const {DATABASE_URL, PORT} = require('./config');
 
-const {Entries} = require('./API-fake.js');
-
+// const {Entries} = require('./API-fake.js');
+const {Entry} = require('./model');
+const Entries = Entry;          // I hate mongoose's naming conventions
 
 const app = express();
 app.use(morgan('common'));
 app.use(bodyParser.json());
 
-app.use(express.static('public')); // /public now serves static files
-app.listen(process.env.PORT || 8080);
+app.use(express.static('public')); // /public/ now serves static files
 
 app.get('/api/entries', (req, res) => {
     Entries
