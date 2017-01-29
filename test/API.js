@@ -93,6 +93,39 @@ describe('Journal/notes entries API endpoints', function() {
                 .then(function(count) {
                     res.body.should.have.length.of(count);
                 });
-    });
+        });
+
+        it('should return entries (records) with the right fields and data', function() {
+            // strategy:
+            //  1. GET journal entries, via server (& db-backing)
+            //  2. make sure response is a JSON array (as per our API)
+            //  3. check that required keys are present in our response
+            //  4. make sure our response's fields match the fields in the
+            //     corresponding database record
+            let resEntry;       // this'll be array[0], of our response
+            return chai.request(app)
+                .get('/api/entries')
+                .then(res => {
+                    res.should.be.json
+                    res.body.should.be.a('array')
+                    res.body.should.have.length.of.at.least(1);
+
+                    res.body.forEach(entry => {
+                        entry.should.be.a('object');
+                        entry.should.include.keys(
+                            'title', 'body', 'author', 'NlpTopics');
+                    });
+                    resEntry = res.body[0];
+                    // \/ look up db entry that corresponds with response[0]
+                    return Entries.findById(resEntry);
+                })
+                .then(entryRecord => {
+                    resEntry.id.should.equal(entryRecord.id);
+                    resEntry.title.should.equal(entryRecord.title);
+                    resEntry.body.should.equal(entryRecord.body);
+                    resEntry.author.should.equal(entryRecord.author);
+                    resEntry.NlpTopics.should.equal(entryRecord.NlpTopics);
+                });
+        });
 
 });
