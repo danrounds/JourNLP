@@ -53,47 +53,37 @@ function tearDownDb() {
 
 
 // our actual tests
-describe('Journal/notes entries API endpoints', function() {
+describe('Journal/notes entries API endpoints', () => {
 
     // each of our hook functions returns a callback
-    before(function() {
-        return runServer(TEST_DATABASE_URL);
-    });
+    before(() => { return runServer(TEST_DATABASE_URL); });
 
-    beforeEach(function() {
-        return initNotesData();
-    });
+    beforeEach(() => { return initNotesData(); });
 
-    afterEach(function() {
-        return tearDownDb();
-    });
+    afterEach(() => { return tearDownDb(); });
 
-    after(function() {
-        return closeServer();
-    });
+    after(() => { return closeServer(); });
 
 
-    describe('GET endpoint :: /api/entries/.*', function() {
+    describe('GET endpoint :: /api/entries/.*', () => {
         // strategy:
         //  1. GET journal entries (via server...and indirectly, our db)
         //  2. check returned status # and data type of response
         //  3. make sure returned entries's N equals the number of records we
         //     populated our db with
-        it('should return all of our entries', function() {
+        it('should return all of our entries', () => {
             let res;
             return chai.request(app)
                 .get('/api/entries')
-                .then(function(_res) {
+                .then((_res) => {
                     res = _res;
                     res.should.have.status(200);
                     return Entries.count();
                 })
-                .then(function(count) {
-                    res.body.should.have.length.of(count);
-                });
+                .then((count) => { res.body.should.have.length.of(count); });
         });
 
-        it('should return entries (records) with the right fields and data', function() {
+        it('should return entries (records) with the right fields and data', () => {
             // strategy:
             //  1. GET journal entries, via server (& db-backing)
             //  2. make sure response is a JSON array (as per our API)
