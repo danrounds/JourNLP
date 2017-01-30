@@ -125,5 +125,31 @@ describe('Journal/notes entries API endpoints', function() {
                     resEntry.NlpTopics.should.equal(entryRecord.NlpTopics);
                 });
         });
+
+        it('should return a specific journal/note entry if accessed as /api/entries/:id endpoint', () => {
+            // strategy:
+            //  1. `fineOne` entry from the database and extracts its id
+            //  2. make a get request to /api/entries/:id (the id from above)
+            //  3. check that the response has the right status and that all
+            //     its fields match the database entry's fields
+            let record;
+            return Entries
+                .findOne()
+                .exec()
+                .then((_record) => {
+                    record = _record;
+                    return chai.request(app)
+                        .get(`/api/entries/${record.id}`);
+                })
+                .then((res) => {
+                    res.should.have.status(200);
+                    const entry = res.body;
+                    entry.id.should.equal(record.id);
+                    entry.title.should.equal(record.title);
+                    entry.author.should.equal(record.author);
+                    entry.body.should.equal(record.body);
+                    entry.NlpTopics.should.equal(record.NlpTopics);
+                });
+        });
     });
 });
