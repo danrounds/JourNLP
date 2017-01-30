@@ -224,6 +224,32 @@ describe('Journal/notes entries API endpoints', function() {
             });
         });
 
+        describe('DELETE endpoint :: /api/entries/:id', () => {
+            // strategy:
+            //  1. arbitrarily get a database record & extract its id
+            //  2. make DELETE request using this id
+            //  3. check response's status code and wee whether a record
+            //     with that id exists in our database
+            let dbEntry;
+            return Entries
+                .findOne()
+                .exec()
+                .then((_dbEntry) => {
+                    dbEntry = _dbEntry;
+                    // make request using our db entry's id
+                    return chai.request(app).delete(`/api/entries/${dbEntry.id}`);
+                })
+                .then((res) => {
+                    res.should.have.status(204);
+                    // post DELETE, we'll try to find the submitted entry in
+                    // our database \/
+                    return Entries.findById(dbEntry.id).exec();
+                })
+                .then((allegedlyDeleted) => {
+                    // here's hoping that Entries.findById(...) doesn't exist
+                    should.not.exist(allegedlyDeleted);
+                });
+        });
     });
 
 });
