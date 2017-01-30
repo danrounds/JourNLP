@@ -5,6 +5,9 @@ const morgan = require('morgan');
 
 const {DATABASE_URL, PORT} = require('./config');
 
+// ES6-style promises for mongoose
+mongoose.Promise = global.Promise;
+
 // const {Entries} = require('./API-fake.js');
 const {Entry} = require('./model');
 const Entries = Entry;          // I hate mongoose's naming conventions
@@ -20,8 +23,6 @@ app.get('/api/entries', (req, res) => {
         .find()
         .exec()
         .then(entries => {
-            console.log('COME ONE!!!');
-            console.log(entries);
             res.json(entries.map(entry => entry.apiRepr()));
         })
         .catch(err => {
@@ -37,7 +38,7 @@ app.get('/api/entries/:id', (req, res) => {
         .then(entry => res.json(entry.apiRepr()))
         .catch(err => {
             console.error(err);
-            res.status(500).json({error: 'something went wrong'});
+            res.status(500).json({error: 'Something went wrong'});
         });
 });
 
@@ -67,10 +68,6 @@ app.put('/api/entries/:id', (req, res) => {
         res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
     }
 
-    // if (!Entries.findById(req.params.id)) {
-    //     res.status(400).json({ error: 'Requested entry id does not exist'});
-    // }
-
     const updated = {};
     const updateableFields = ['title', 'body', 'author'];
     // we'll make the client send all three of these values, but API users needn't
@@ -79,12 +76,13 @@ app.put('/api/entries/:id', (req, res) => {
             updated[field] = req.body[field];
         }
     });
-
     Entries
         .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
         .exec()
         .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
-        .catch(err => res.status(500).json({message: 'Something went wrong'}));
+        // .then(updatedPost => res.status(201).json({thing: 'O KRAP, SON'}))
+        .catch(err => res.status(500).json(
+            {message: 'Something went wrong. Are you submitting a valid id AND the right fields?'}));
 });
 
 app.delete('/api/entries/:id', (req, res) => {
@@ -94,7 +92,7 @@ app.delete('/api/entries/:id', (req, res) => {
         .then(() => res.status(204).json({message: 'success'}))
         .catch(err => {
             console.error(err);
-            res.status(500).json({error: 'Something went wrong'});
+            res.status(500).json({error: 'Something went wrong. Perhaps you specified a wrong id?'});
         });
 });
 

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const notesEntrySchema = mongoose.Schema({
     title: {type: String, required: true},
     body: {type: String, required: true},
-    author: {type: String},             // account name
+    author: {type: String, required: true},             // account name
     NlpTopics: {type: String},
     publishedAt: {type: Date, default: Date.now}
     // , lastupdatedAt: {type: String}
@@ -11,7 +11,7 @@ const notesEntrySchema = mongoose.Schema({
 
 
 // This is provided only to future-proof our API representation.
-// The commented out function below is an example of why we might
+// The commented-out function below is an example of why we might
 // want to define some virtual methods for our API-returned data.
 notesEntrySchema.methods.apiRepr = function() {
     return {
