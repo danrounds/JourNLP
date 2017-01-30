@@ -73,7 +73,7 @@ describe('Journal/notes entries API endpoints', function() {
     });
 
 
-    describe('GET endpoint :: /api/entries/', function() {
+    describe('GET endpoint :: /api/entries/.*', function() {
         // strategy:
         //  1. GET journal entries (via server...and indirectly, our db)
         //  2. check returned status # and data type of response
@@ -152,4 +152,40 @@ describe('Journal/notes entries API endpoints', function() {
                 });
         });
     });
+
+    describe('POST endpoint :: /api/entries/', () => {
+        // strategy:
+        //  1. generate random JSON data for a new journal entry
+        //  2. make POST request
+        //  3. check status and compare server response to the data we
+        //     generated/submitted. They should obviously be the same
+        //  4. examine the relevant database entry to see if it also matches
+        //     the response
+        it('should add a new entry', () => {
+            const submittedEntry = generateEntry(); // random `entry' data
+
+            return chai.request(app)
+                .post('/api/entries')
+                .send(submittedEntry)
+                .then((res) => {
+                    // compare our response to the object we created
+                    res.should.have.status(201);
+                    res.should.be.json;
+                    res.body.should.include.keys('title', 'body', 'author');
+                    res.body.title.should.equal(submittedEntry.title);
+                    res.body.body.should.equal(submittedEntry.body);
+                    res.body.author.should.equal(submittedEntry.author);
+                    // and now return the relevant database entry
+                    return Entries.findById(res.body.id);
+                })
+                .then((dbEntry) => {
+                    dbEntry.title.should.equal(submittedEntry.title);
+                    dbEntry.body.should.equal(dbEntry.body);
+                    dbEntry.author.should.equal(dbEntry.author);
+                });
+        });
+
+
+    });
+
 });
