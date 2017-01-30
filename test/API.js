@@ -1,3 +1,6 @@
+// Things you could add:
+//  - Tests for bad input
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const faker = require('faker');
