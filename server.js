@@ -80,7 +80,6 @@ app.put('/api/entries/:id', (req, res) => {
         .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
         .exec()
         .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
-        // .then(updatedPost => res.status(201).json({thing: 'O KRAP, SON'}))
         .catch(err => res.status(500).json(
             {message: 'Something went wrong. Are you submitting a valid id AND the right fields?'}));
 });
