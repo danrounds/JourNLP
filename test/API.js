@@ -9,11 +9,8 @@ const mongoose = require('mongoose');
 // lets us use THING.should.have/THING.should.be-style constructs
 const should = chai.should();
 
-const {Entry} = require('../model'); // mongoose likes singular nouns
+const {Entry} = require('../api'); // mongoose likes singular nouns
 const Entries = Entry;               // ...but I don't
-
-// ES6-style promises for mongoose
-mongoose.Promise = global.Promise;
 
 const {app, runServer, closeServer} = require('../server');
 const {TEST_DATABASE_URL} = require('../config');
