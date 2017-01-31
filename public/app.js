@@ -195,7 +195,7 @@ function writeEditButtons() {
                 editEntry({id: id, title: title, body: body});
             } else {
                 id = '';
-                submitEntry({title: title, body: body});
+                submitEntry({title: title, body: body, author:'HARDCODED_REMOVE'});
             }
             window.open(`view-entry.html?${id}`, '_self');
         }

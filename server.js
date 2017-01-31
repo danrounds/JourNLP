@@ -20,7 +20,8 @@ app.use(express.static('public')); // /public/ now serves static files
 
 app.get('/api/entries', (req, res) => {
     Entries
-        .find()
+       .find()
+        .sort({publishedAt: -1})
         .exec()
         .then(entries => {
             res.json(entries.map(entry => entry.apiRepr()));
