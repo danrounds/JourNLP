@@ -1,11 +1,25 @@
+// schema and wrapper method(s) for our our journal entries
+
 const mongoose = require('mongoose');
 
 const notesEntrySchema = mongoose.Schema({
-    title: {type: String, required: true},
-    body: {type: String, required: true},
-    author: {type: String, required: true},             // account name
-    NlpTopics: {type: String},
-    publishedAt: {type: Date, default: Date.now}
+    title:{
+        type: String,
+        required: true
+    },
+    body: {
+        type: String,
+        required: true
+    },
+    author: {             // account name
+        type: String,
+        required: true
+    },
+    NlpTopics: { type: String },
+    publishedAt: {
+        type: Date,
+        default: Date.now
+    }
     // , lastupdatedAt: {type: String}
 });
 
