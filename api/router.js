@@ -1,7 +1,7 @@
 const express = require('express');
 const jsonParser = require('body-parser').json();
 
-const {Entry} = require('./model');
+const {Entry} = require('./entry-model');
 const Entries = Entry;          // I hate mongoose's naming conventions
 
 const router = express.Router();
