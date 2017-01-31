@@ -1,19 +1,31 @@
 const bodyParser = require('body-parser');
 const express = require('express');
+const mongoose = require('mongoose');
+const morgan = require('morgan');
+
+const {DATABASE_URL, PORT} = require('./config');
+
+// ES6-style promises for mongoose
+mongoose.Promise = global.Promise;
+
+// const {Entries} = require('./API-fake.js');
+const {Entry} = require('./model');
+const Entries = Entry;          // I hate mongoose's naming conventions
+
 const app = express();
-
-const {Entries} = require('./API-fake.js');
-
+app.use(morgan('common'));
 app.use(bodyParser.json());
 
-app.use(express.static('public')); // /public now serves static files
-app.listen(process.env.PORT || 8080);
+app.use(express.static('public')); // /public/ now serves static files
 
 app.get('/api/entries', (req, res) => {
     Entries
-        .find()
+       .find()
+        .sort({publishedAt: -1})
         .exec()
-        .then(entries => res.json(entries))
+        .then(entries => {
+            res.json(entries.map(entry => entry.apiRepr()));
+        })
         .catch(err => {
             console.error(err);
             res.status(500).json({error: 'something went wrong'});
@@ -24,10 +36,10 @@ app.get('/api/entries/:id', (req, res) => {
     Entries
         .findById(req.params.id)
         .exec()
-        .then(entry => res.json(entry))
+        .then(entry => res.json(entry.apiRepr()))
         .catch(err => {
             console.error(err);
-            res.status(500).json({error: 'something went wrong'});
+            res.status(500).json({error: 'Something went wrong'});
         });
 });
 
@@ -45,7 +57,7 @@ app.post('/api/entries/', (req, res) => {
             body: req.body.body,
             author: req.body.author
         })
-        .then(entry => res.status(201).json(entry))
+        .then(entry => res.status(201).json(entry.apiRepr()))
         .catch(err => {
             console.error(err);
             res.status(500).json({error: 'Something went wrong'});
@@ -57,10 +69,6 @@ app.put('/api/entries/:id', (req, res) => {
         res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
     }
 
-    // if (!Entries.findById(req.params.id)) {
-    //     res.status(400).json({ error: 'Requested entry id does not exist'});
-    // }
-
     const updated = {};
     const updateableFields = ['title', 'body', 'author'];
     // we'll make the client send all three of these values, but API users needn't
@@ -69,12 +77,12 @@ app.put('/api/entries/:id', (req, res) => {
             updated[field] = req.body[field];
         }
     });
-
     Entries
         .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
         .exec()
-        .then(updatedPost => res.status(201).json(updatedPost))
-        .catch(err => res.status(500).json({message: 'Something went wrong'}));
+        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
+        .catch(err => res.status(500).json(
+            {message: 'Something went wrong. Are you submitting a valid id AND the right fields?'}));
 });
 
 app.delete('/api/entries/:id', (req, res) => {
@@ -84,7 +92,7 @@ app.delete('/api/entries/:id', (req, res) => {
         .then(() => res.status(204).json({message: 'success'}))
         .catch(err => {
             console.error(err);
-            res.status(500).json({error: 'Something went wrong'});
+            res.status(500).json({error: 'Something went wrong. Perhaps you specified a wrong id?'});
         });
 });
 
@@ -92,4 +100,48 @@ app.use('*', function(req, res) {
     res.status(404).json({message: 'Resource not found'});
 });
 
-module.exports = {app};
+
+// 
+let server;
+
+function runServer(databaseUrl=DATABASE_URL, port=PORT) {
+    return new Promise((resolve, reject) => {
+        mongoose.connect(databaseUrl, err => {
+            if (err) {
+                return reject(err);
+            }
+            server = app.listen(port, () => {
+                console.log(`Journal/Notes app is listening on port ${port}`);
+                resolve();
+            })
+                .on('error', err => {
+                    mongoose.disconnect();
+                    reject(err);
+                });
+        });
+    });
+}
+
+function closeServer() {
+    return mongoose.disconnect().then(() => {
+        return new Promise((resolve, reject) => {
+            console.log('Closing server');
+            server.close(err => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve();
+            });
+        });
+    });
+}
+
+// if we call server.js, directly (`node server.js'). this block runs
+if (require.main === module) {
+    runServer().catch(err => console.error(err));
+}
+
+// we export runServer and closeServer so that other code (right now, just
+// tests) can start/close the server, at will. Our db-oriented test will need
+// to start & close, over and over.
+module.exports = {runServer, closeServer, app};
