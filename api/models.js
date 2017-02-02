@@ -46,7 +46,7 @@ notesEntrySchema.methods.apiRepr = function() {
 
 // user accounts will have an array of journal entries
 const userAccountSchema = mongoose.Schema({
-    account: {
+    username: {
         type: String,
         require: true,
         unique: true,
@@ -94,4 +94,3 @@ UserAccount
 
 module.exports = {UserAccount, Entry};
 // module.exports = {UserAccount};
-

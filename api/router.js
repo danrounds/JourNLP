@@ -16,7 +16,7 @@ router.use(jsonParser);
 const strategy = new BasicStrategy((username, password, cb) => {
     let user;
     UserAccounts
-        .findOne({'account': username})
+        .findOne({'username': username})
         .exec()
         .then(_user => {
             user = _user;
@@ -51,15 +51,14 @@ router.use(passport.initialize());
 //         });
 // });
 
-router.get('/entries', passport.authenticate('basic', {session: false}), (req, res) => {
-// router.get('/entries', (req, res) => {
+router.get('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
     UserAccounts
-        .find()
-        .sort({publishedAt: -1})
-        .exec()
-        .then(entries => {
-            res.json(entries.map(entry => entry));
-        })
+        .findOne({username: req.user.username})
+        // .sort({publishedAt: -1})
+        // .then(entries => {
+        //     res.json(entries.map(entry => entry));
+    // })
+        .then(userData => res.json(userData))
         .catch(err => {
             console.error(err);
             res.status(500).json({error: 'something went wrong'});
@@ -132,21 +131,68 @@ router.delete('/entries/:id', (req, res) => {
         });
 });
 
+function checkFields(body, fields) {
+    for (let field of fields) {
+        if (!body.hasOwnProperty(field))
+            return `Missing "${field}" in request body`;
+    }
+    return false;
+}
+
 router.post('/user_account/', (req, res) => {
+    const fieldMissing = checkFields(req.body, ['username', 'password']);
+    if (fieldMissing) {
+        res.status(400).json({error: fieldMissing});
+    }
+
     UserAccounts
         .create({
-            account: req.body.account,
+            username: req.body.username,
             password: req.body.password
         })
         .then(user => res.status(201).json(user))
         .catch((err) => {
             if (err.name == 'ValidationError') {
-                res.status(422).json({message: err.errors.account.message});
+                res.status(422).json({message: err.errors.username.message});
             } else {
                 res.status(500).json({message: 'Server error'});
             }
         });
 });
+
+
+router.put('/user_account/', (req, res) => {
+    const fieldMissing = checkFields(req.body, ['username','oldPassword','newPassword']);
+    if (fieldMissing) {
+        res.status(400).json({error: fieldMissing});
+    }
+
+    UserAccounts
+        .findOneAndUpdate(req.params.username)
+
+});
+
+router.put('/entries/:id', (req, res) => {
+    if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+        res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
+    }
+
+    const updated = {};
+    const updateableFields = ['title', 'body', 'author'];
+    // we'll make the client send all three of these values, but API users needn't
+    updateableFields.forEach(field => {
+        if (field in req.body) {
+            updated[field] = req.body[field];
+        }
+    });
+    Entries
+        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
+        .exec()
+        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
+        .catch(err => res.status(500).json(
+            {message: 'Something went wrong. Are you submitting a valid id AND the right fields?'}));
+});
+
 
 module.exports = {router};
 
