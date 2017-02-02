@@ -38,19 +38,6 @@ passport.use(strategy);
 router.use(passport.initialize());
 
 //
-// router.get('/entries', (req, res) => {
-//     Entries
-//        .find()
-//         .sort({publishedAt: -1})
-//         .exec()
-//         .then(entries => {
-//             res.json(entries.map(entry => entry.apiRepr()));
-//         })
-//             console.error(err);
-//             res.status(500).json({error: 'something went wrong'});
-//         });
-// });
-
 router.get('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
     UserAccounts
         .findOne({username: req.user.username})
@@ -78,23 +65,33 @@ router.get('/entries/:id', (req, res) => {
         });
 });
 
-router.post('/entries/', (req, res) => {
-    const requiredFields = ['title', 'body', 'author'];
+router.post('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
+    const requiredFields = ['title', 'body'];
     requiredFields.forEach(field => {
         if (!(field in req.body)) {
             res.status(400).json(
                 {error: `Missing "${field}" in request body`});
         }
     });
+
     Entries
         .create({
             title: req.body.title,
             body: req.body.body,
-            author: req.body.author
+            author: req.user.username
+        })
+        .then(entry => {
+            UserAccounts
+                .findOne({'username': req.user.username})
+                .exec()
+                .then(user => {
+                    user.posts.push(entry);
+                    user.save();
+                });
+            return entry;
         })
         .then(entry => res.status(201).json(entry.apiRepr()))
         .catch(err => {
-            console.error(err);
             res.status(500).json({error: 'Something went wrong'});
         });
 });
@@ -155,6 +152,7 @@ router.post('/user_account/', (req, res) => {
             if (err.name == 'ValidationError') {
                 res.status(422).json({message: err.errors.username.message});
             } else {
+                // I'm not sure I want the server exposing whether accounts exist
                 res.status(500).json({message: 'Server error'});
             }
         });
