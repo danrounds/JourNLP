@@ -20,7 +20,6 @@ const strategy = new BasicStrategy((username, password, cb) => {
         .exec()
         .then(_user => {
             user = _user;
-            console.log('HEREEEEEE\'S THE USER :::\n\n'+user+'\n\n');
             if (!user) {
                 return cb(null, false, {message: 'Incorrect username'});
             }
@@ -28,7 +27,6 @@ const strategy = new BasicStrategy((username, password, cb) => {
         })
         .then(isValid => {
             if (!isValid) {
-                console.log('IS IT VALID?!!! ::: '+isValid);
                 return cb(null, false, {message: 'Incorrect password'});
             }
             return cb(null, user); // success!
@@ -131,6 +129,22 @@ router.delete('/entries/:id', (req, res) => {
         .catch(err => {
             console.error(err);
             res.status(500).json({error: 'Something went wrong. Perhaps you specified a wrong id?'});
+        });
+});
+
+router.post('/user_account/', (req, res) => {
+    UserAccounts
+        .create({
+            account: req.body.account,
+            password: req.body.password
+        })
+        .then(user => res.status(201).json(user))
+        .catch((err) => {
+            if (err.name == 'ValidationError') {
+                res.status(422).json({message: err.errors.account.message});
+            } else {
+                res.status(500).json({message: 'Server error'});
+            }
         });
 });
 

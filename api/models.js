@@ -52,12 +52,16 @@ const userAccountSchema = mongoose.Schema({
         unique: true,
         validate: {
             validator: (str) => /[a-zA-Z0-9_]+/.test(str),
-            message: '{VALUE} is not a well-formed account name.'
+            message: 'Poorly-formed name'
         }
     },
     password: {
         type: String,
-        require: true
+        require: true,
+        validate: {
+            validator: (str) => str.length > 5,
+            message: 'Password\'s not long enough'
+        }
     },
     posts: [notesEntrySchema]   // /journal entries/notes/whatever
 });
