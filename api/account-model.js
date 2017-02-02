@@ -7,7 +7,11 @@ const userAccountSchema = mongoose.Schema({
     account: {
         type: String,
         require: true,
-        unique: true
+        unique: true,
+        validate: {
+            validator: (str) => /[a-zA-Z0-9_]+/.test(str),
+            message: '{VALUE} is not a well-formed account name.'
+        }
     },
     password: {
         type: String,
