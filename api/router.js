@@ -178,14 +178,14 @@ router.put('/user_account/', passport.authenticate('basic', {session: false}), (
         .catch(err => res.status(500).json({message: 'Server error'}));
 });
 
-router.delete('/entries/:id', (req, res) => {
-    Entries
-        .findByIdAndRemove(req.params.id)
+router.delete('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
+    UserAccounts
+        .remove({username: req.user.username})
         .exec()
-        .then(() => res.status(204).json({message: 'success'}))
+        .then(() => res.status(204)) // Success!
         .catch(err => {
             console.error(err);
-            res.status(500).json({error: 'Something went wrong. Perhaps you specified a wrong id?'});
+            res.status(500).json({error: 'Server error'});
         });
 });
 
