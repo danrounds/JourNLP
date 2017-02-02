@@ -142,7 +142,7 @@ function checkFields(body, fields) {
 router.post('/user_account/', (req, res) => {
     const fieldMissing = checkFields(req.body, ['username', 'password']);
     if (fieldMissing) {
-        res.status(400).json({error: fieldMissing});
+        return res.status(400).json({error: fieldMissing});
     }
 
     UserAccounts
@@ -161,36 +161,32 @@ router.post('/user_account/', (req, res) => {
 });
 
 
-router.put('/user_account/', (req, res) => {
-    const fieldMissing = checkFields(req.body, ['username','oldPassword','newPassword']);
+router.put('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
+    // Used solely to update a user's password
+    const fieldMissing = checkFields(req.body, ['username','newPassword']);
     if (fieldMissing) {
-        res.status(400).json({error: fieldMissing});
+        return res.status(400).json({error: fieldMissing});
     }
 
     UserAccounts
-        .findOneAndUpdate(req.params.username)
-
+        .update(
+            {username: req.user.username},
+            {$set: {'password': req.body.newPassword}},
+            {runValidators: true}
+        )
+        .then((updated) => res.status(204).json(updated))
+        .catch(err => res.status(500).json({message: 'Server error'}));
 });
 
-router.put('/entries/:id', (req, res) => {
-    if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
-        res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
-    }
-
-    const updated = {};
-    const updateableFields = ['title', 'body', 'author'];
-    // we'll make the client send all three of these values, but API users needn't
-    updateableFields.forEach(field => {
-        if (field in req.body) {
-            updated[field] = req.body[field];
-        }
-    });
+router.delete('/entries/:id', (req, res) => {
     Entries
-        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
+        .findByIdAndRemove(req.params.id)
         .exec()
-        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
-        .catch(err => res.status(500).json(
-            {message: 'Something went wrong. Are you submitting a valid id AND the right fields?'}));
+        .then(() => res.status(204).json({message: 'success'}))
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: 'Something went wrong. Perhaps you specified a wrong id?'});
+        });
 });
 
 
