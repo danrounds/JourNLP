@@ -63,7 +63,8 @@ const userAccountSchema = mongoose.Schema({
             message: 'Password\'s not long enough'
         }
     },
-    posts: [notesEntrySchema]   // /journal entries/notes/whatever
+    // posts: [notesEntrySchema]   // /journal entries/notes/whatever
+    posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Entry'}]   // /journal entries/notes/whatever
 });
 
 // userAccountSchema.methods.validatePassword = (password) => {
