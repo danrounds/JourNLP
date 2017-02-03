@@ -61,12 +61,12 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
         .catch(err => res.status(500).json({error: 'something went wrong'}));
 });
 
-router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => { 
+router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
     Entries
         .findById(req.params.id)
         .exec()
         .then(entry => {
-            if (req.user.username === entry.author) 
+            if (req.user.username === entry.author)
                 res.json(entry.apiRepr());
             else
                 res.status(403).send();

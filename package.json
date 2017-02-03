@@ -11,7 +11,9 @@
     "mongoose": "^4.7.9",
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
-    "passport-http": "^0.3.0"
+    "passport-http": "^0.3.0",
+    "retext": "^4.0.0",
+    "retext-keywords": "^3.1.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

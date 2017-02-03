@@ -94,4 +94,3 @@ UserAccount
     });
 
 module.exports = {UserAccount, Entry};
-// module.exports = {UserAccount};
