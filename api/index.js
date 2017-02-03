@@ -5,4 +5,4 @@
 const {Entry, UserAccount} = require('./models');
 const {router} = require('./router');
 
-module.exports = {Entry, router};
+module.exports = {Entry, UserAccount, router};

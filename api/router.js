@@ -3,8 +3,6 @@ const jsonParser = require('body-parser').json();
 const {BasicStrategy} = require('passport-http');
 const passport = require('passport');
 
-// const {Entry} = require('./entry-model');
-// const {UserAccount} = require('./account-model');
 const {UserAccount, Entry} = require('./models');
 const Entries = Entry;          // I hate mongoose's naming conventions
 const UserAccounts = UserAccount;
@@ -16,7 +14,7 @@ router.use(jsonParser);
 const strategy = new BasicStrategy((username, password, cb) => {
     let user;
     UserAccounts
-        .findOne({'username': username})
+        .findOne({username: username})
         .exec()
         .then(_user => {
             user = _user;
@@ -192,4 +190,3 @@ router.delete('/user_account/', passport.authenticate('basic', {session: false})
 });
 
 module.exports = {router};
-
