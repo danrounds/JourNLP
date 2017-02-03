@@ -35,13 +35,12 @@ function populateState() {
 }
 
 function submitEntry(data) {
-    return $.post(
-        { url: '../api/entries',
-          data: JSON.stringify(data),
-          dataType: 'json',
-          contentType: 'application/json'
-        }
-    );
+    return $.post({
+        url: '../api/entries',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: 'application/json'
+    });
 }
 
 function editEntry(data) {
@@ -103,10 +102,10 @@ function addListingsButtonsProperties(id, title) {
 
     // delete button
     $('#del_'+id).click(function() {
-        var answer = confirm(`Are you sure you wanna delete "${title}"?`);
+        var answer = confirm(`Are you sure you want to delete "${title}"?`);
         if (answer) {
             deleteEntry(id)
-                .catch(function() { window.open('listings.html', '_self') });
+                .catch(function() { window.open('listings.html', '_self'); });
             // this isn't especially robust error handling; it just reloads the
             // page if the deletion fails. I suppose so that the page reflects the
             // server's state
