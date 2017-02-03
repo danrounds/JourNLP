@@ -7,6 +7,8 @@ const {UserAccount, Entry} = require('./models');
 const Entries = Entry;          // I hate mongoose's naming conventions
 const UserAccounts = UserAccount;
 
+const {categorize} = require('./nlp');
+
 const router = express.Router();
 
 router.use(jsonParser);
@@ -81,12 +83,16 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
         return res.status(400).json(fieldMissing);
     }
 
-    Entries
-        .create({
-            title: req.body.title,
-            body: req.body.body,
-            author: req.user.username
-        })
+    categorize(req.body.title + ' ' + req.body.body)
+        .then(nlpTopics =>
+              Entries
+              .create({
+                  title: req.body.title,
+                  body: req.body.body,
+                  author: req.user.username,
+                  NlpTopics: nlpTopics
+              })
+             )
         .then(entry => {
             UserAccounts
                 .findOne({username: req.user.username})
@@ -99,6 +105,26 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
         })
         .then(entry => res.status(201).json(entry.apiRepr()))
         .catch(err => res.status(500).json({error: 'Something went wrong'}));
+
+    // Entries
+    //     .create({
+    //         title: req.body.title,
+    //         body: req.body.body,
+    //         author: req.user.username,
+    //         NlpTopics: nlpTopics
+    //     })
+    //     .then(entry => {
+    //         UserAccounts
+    //             .findOne({username: req.user.username})
+    //             .exec()
+    //             .then(user => {
+    //                 user.posts.push(entry._id);
+    //                 user.save();
+    //             });
+    //         return entry;
+    //     })
+    //     .then(entry => res.status(201).json(entry.apiRepr()))
+    //     .catch(err => res.status(500).json({error: 'Something went wrong'}));
 });
 
 router.put('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {

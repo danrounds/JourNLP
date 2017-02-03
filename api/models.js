@@ -16,7 +16,7 @@ const notesEntrySchema = mongoose.Schema({
         type: String,
         required: true
     },
-    NlpTopics: { type: String },
+    NlpTopics: [{ type: String }],
     publishedAt: {
         type: Date,
         default: Date.now
@@ -63,7 +63,6 @@ const userAccountSchema = mongoose.Schema({
             message: 'Password\'s not long enough'
         }
     },
-    // posts: [notesEntrySchema]   // /journal entries/notes/whatever
     posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Entry'}]   // /journal entries/notes/whatever
 });
 
