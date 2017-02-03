@@ -55,7 +55,7 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
         .populate('posts')
         .then(entries => {
             entries = entries.posts;
-            res.json(entries.map(entry => entry));
+            res.json(entries.map(entry => entry.apiRepr()));
         })
         .then(userData => res.json(userData))
         .catch(err => res.status(500).json({error: 'something went wrong'}));
