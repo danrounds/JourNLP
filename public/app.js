@@ -13,9 +13,9 @@ var state = {
             entry.tags.forEach(function(tag) {
                 var temp = state.globalTags[tag];
                 if (temp)
-                    state.globalTags[tag].push(entry.id);
+                    state.globalTags[tag].push({id: entry.id, title: entry.title});
                 else
-                    state.globalTags[tag] = [entry.id];
+                    state.globalTags[tag] = [{id: entry.id, title: entry.title}];
             });
         });
         console.log(state.globalTags);
