@@ -45,6 +45,7 @@ const keywords = require('retext-keywords');
 //         .then(out => console.log(out));
 // }
 
+// I implemented this with promises only for consistency of "interface"
 function categorize(text) {
     const nKeywords = Math.round( Math.log1p(text.length / 5.3 || 3 ));
     return Promise.resolve(retext().use(keywords, {maximum: nKeywords}).process(text))
@@ -57,9 +58,9 @@ function categorize(text) {
                 keyphrases.push(phrase.matches[0].nodes.map(nlcstToString).join(''));
             });
 
-            if (!keyphrases.length)
-                return keywords;
-            return keyphrases;
+            if (!keyphrases.length) // keyphrases are nice, but if analysis
+                return keywords;    // doesn't give us any, we'll settle for
+            return keyphrases;      // keywords
         });
 }
 

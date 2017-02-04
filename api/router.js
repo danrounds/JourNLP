@@ -138,18 +138,26 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
             updated[field] = req.body[field];
         }
     });
+
     Entries
     // make sure the author is the one editing the entry
         .findById(req.params.id)
         .then(entry => {
             if (req.user.username !== entry.author)
                 res.status(403).send(); // 403: Forbidden
+            return req.body.title || entry.title;
+        })
+        .then((title) => {
+            categorize(title + ' ' + req.body.body)
+                .then(nlpTopics => {
+                    updated.NlpTopics = nlpTopics;
+                    Entries
+                        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
+                        .exec()
+                        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
+                        .catch(err => res.status(500).json({message: 'Server Error'}));
+                });
         });
-    Entries
-        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
-        .exec()
-        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
-        .catch(err => res.status(500).json({message: 'Server Error'}));
 });
 
 router.delete('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
