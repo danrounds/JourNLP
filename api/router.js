@@ -52,7 +52,7 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
     // this returns an array of notes entries
     // add: sort-by-date
     UserAccounts
-        .findOne({username: req.user.username}, {posts:true})
+        .findOne({username: req.user.username}, 'posts')
         // .sort({publishedAt: -1})
         .populate('posts')
         .then(entries => {
@@ -105,26 +105,6 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
         })
         .then(entry => res.status(201).json(entry.apiRepr()))
         .catch(err => res.status(500).json({error: 'Something went wrong'}));
-
-    // Entries
-    //     .create({
-    //         title: req.body.title,
-    //         body: req.body.body,
-    //         author: req.user.username,
-    //         nlpTopics: nlpTopics
-    //     })
-    //     .then(entry => {
-    //         UserAccounts
-    //             .findOne({username: req.user.username})
-    //             .exec()
-    //             .then(user => {
-    //                 user.posts.push(entry._id);
-    //                 user.save();
-    //             });
-    //         return entry;
-    //     })
-    //     .then(entry => res.status(201).json(entry.apiRepr()))
-    //     .catch(err => res.status(500).json({error: 'Something went wrong'}));
 });
 
 router.put('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
@@ -222,5 +202,25 @@ router.delete('/user_account/', passport.authenticate('basic', {session: false})
         .then(() => res.status(204).send()) // Success!
         .catch(err => res.status(500).json({error: 'Server error'}));
 });
+
+router.get('/user_account/tags/', passport.authenticate('basic', {session: false}), (req, res) => {
+    // returns the NLP tags associated with a given user (global tags), form:
+    //   [ { "tags" : [ "...", "...", "..."], "id" : "2930gkj0923jg0329jg093jg0" }, {...}, {...} ]
+    // There's no check for redundancy, here; we let the client do that.
+
+    const array = [];
+    UserAccounts
+        .findOne({username: req.user.username}, 'posts')
+        .populate('posts')
+        .then(userData => {
+            userData.posts.forEach(post => {
+                if (post.nlpTopics.length)
+                    array.push({tags: post.nlpTopics, id: post.id});
+            });
+            res.json(array);
+        })
+        .catch(err => res.status(500).json({error: 'Something went wrong'}));
+});
+
 
 module.exports = {router};
