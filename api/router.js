@@ -203,27 +203,4 @@ router.delete('/user_account/', passport.authenticate('basic', {session: false})
         .catch(err => res.status(500).json({error: 'Server error'}));
 });
 
-router.get('/user_account/tags/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // returns the NLP tags associated with a given user (global tags), form:
-    //   [ { "tags" : [ "...", "...", "..."],
-    //       "id" : "2930gkj0923jg0329jg093jg0",
-    //       "title": "WHATEVER"}, {...}, {...} ]
-    // There's no check for redundancy, here; we let the client do that.
-    // This endpoint could pretty easily be eliminated, with GET /api/entries
-    // in its place, and slightly-tweaked client code.
-
-    const array = [];
-    UserAccounts
-        .findOne({username: req.user.username}, 'posts')
-        .populate('posts')
-        .then(userData => {
-            userData.posts.forEach(post => {
-                if (post.nlpTopics.length)
-                    array.push({tags: post.nlpTopics, id: post.id, title: post.title});
-            });
-            res.json(array);
-        })
-        .catch(err => res.status(500).json({error: 'Something went wrong'}));
-});
-
 module.exports = {router};

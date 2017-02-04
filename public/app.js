@@ -8,14 +8,22 @@ var state = {
         state.current = state.entries[0];
     },
     globalTags: {},
-    sortTags: function(unsortedTags) {
-        unsortedTags.forEach(function(entry) {
-            entry.tags.forEach(function(tag) {
-                var temp = state.globalTags[tag];
-                if (temp)
-                    state.globalTags[tag].push({id: entry.id, title: entry.title});
+    // This lets us map from tagged topics back to the posts that were tagged
+    // with them. The rationale here is that we can group together common tags.
+    // 
+    // E.g., multiple posts might be given the tag "food."
+    // keys:   individual tags from nlpTopics, i.e. ...entry.nlpTopics[i]
+    // values: arrays of `entries' that contained the given tag.
+
+    sortTags: function() {
+        // this is the function that does the above mapping for us
+        state.entries.forEach(function(entry) {
+            entry.nlpTopics.forEach(function(tag) {
+                var hasVal = state.globalTags[tag];
+                if (hasVal)
+                    state.globalTags[tag].push(entry);
                 else
-                    state.globalTags[tag] = [{id: entry.id, title: entry.title}];
+                    state.globalTags[tag] = [entry];
             });
         });
         console.log(state.globalTags);
@@ -43,13 +51,6 @@ function populateState() {
         .done(function(data) {
             state.entries = data;
             state.resetCurrent();
-        });
-}
-
-function getTags() {
-    return $.getJSON('../api/user_account/tags')
-        .done(function(unsortedTags) {
-            state.sortTags(unsortedTags);
         });
 }
 
@@ -135,7 +136,13 @@ function addListingsButtonsProperties(id, title) {
 }
 
 function updateListingsView() {
-    // $('.tags-text').text(state.tags);
+
+    var tagsHtml = '';
+    // for (var tagEntry in state.globalTags){
+    //     console.log(state.globalTags[tagEntry]);
+    //     console.log(state.globalTags[tagEntry]);
+    //     console.log(tagEntry);
+    // }
 
     $('.tags-text').text(state.tags); // update global tags
     $('.entries-list').text('');
@@ -238,7 +245,8 @@ function writeEntryUpdate() {
 }
 
 function listingsUpdate() {
-    $.when(populateState(), getTags())
+    populateState()
+        .done(state.sortTags)
         .done(updateListingsView);
 }
 
