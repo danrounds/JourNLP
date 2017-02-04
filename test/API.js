@@ -40,7 +40,7 @@ function generateEntry() {
             faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n',
         author: faker.internet.userName(),
-        NlpTopics: faker.random.words(8),
+        nlpTopics: faker.random.words(8),
         publishedAt: faker.date.past()
         // lastupdatedAt: faker.date.future()
     };
@@ -101,7 +101,7 @@ describe('Journal/notes entries API endpoints', () => {
                     res.body.forEach(entry => {
                         entry.should.be.a('object');
                         entry.should.include.keys(
-                            'title', 'body', 'author', 'NlpTopics');
+                            'title', 'body', 'author', 'nlpTopics');
                     });
                     resEntry = res.body[0];
                     // \/ look up db entry that corresponds with response[0]
@@ -112,7 +112,7 @@ describe('Journal/notes entries API endpoints', () => {
                     resEntry.title.should.equal(entryRecord.title);
                     resEntry.body.should.equal(entryRecord.body);
                     resEntry.author.should.equal(entryRecord.author);
-                    resEntry.NlpTopics.should.equal(entryRecord.NlpTopics);
+                    resEntry.nlpTopics.should.equal(entryRecord.nlpTopics);
                 });
         });
 
@@ -138,7 +138,7 @@ describe('Journal/notes entries API endpoints', () => {
                     entry.title.should.equal(record.title);
                     entry.author.should.equal(record.author);
                     entry.body.should.equal(record.body);
-                    entry.NlpTopics.should.equal(record.NlpTopics);
+                    entry.nlpTopics.should.equal(record.nlpTopics);
                 });
         });
     });

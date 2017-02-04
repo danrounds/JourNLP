@@ -16,7 +16,7 @@ const notesEntrySchema = mongoose.Schema({
         type: String,
         required: true
     },
-    NlpTopics: { type: String },
+    nlpTopics: [{ type: String }],
     publishedAt: {
         type: Date,
         default: Date.now
@@ -34,14 +34,14 @@ notesEntrySchema.methods.apiRepr = function() {
         title: this.title,
         body: this.body,
         author: this.author,
-        NlpTopics: this.NlpTopics,
-        // NlpTopics: this.cleanedUpNlpTopics
+        nlpTopics: this.nlpTopics,
+        // nlpTopics: this.cleanedUpNlpTopics
         publishedAt: this.publishedAt
     };
 };
 
 // notesEntrySchema.virtual('cleanedUpNlpTopics').get(function() {
-//     return this.NlpTopics.join(', ');
+//     return this.nlpTopics.join(', ');
 // });
 
 // user accounts will have an array of journal entries
@@ -63,7 +63,6 @@ const userAccountSchema = mongoose.Schema({
             message: 'Password\'s not long enough'
         }
     },
-    // posts: [notesEntrySchema]   // /journal entries/notes/whatever
     posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Entry'}]   // /journal entries/notes/whatever
 });
 
@@ -94,4 +93,3 @@ UserAccount
     });
 
 module.exports = {UserAccount, Entry};
-// module.exports = {UserAccount};

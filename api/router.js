@@ -7,6 +7,8 @@ const {UserAccount, Entry} = require('./models');
 const Entries = Entry;          // I hate mongoose's naming conventions
 const UserAccounts = UserAccount;
 
+const {categorize} = require('./nlp');
+
 const router = express.Router();
 
 router.use(jsonParser);
@@ -50,7 +52,7 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
     // this returns an array of notes entries
     // add: sort-by-date
     UserAccounts
-        .findOne({username: req.user.username}, {posts:true})
+        .findOne({username: req.user.username}, 'posts')
         // .sort({publishedAt: -1})
         .populate('posts')
         .then(entries => {
@@ -61,12 +63,12 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
         .catch(err => res.status(500).json({error: 'something went wrong'}));
 });
 
-router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => { 
+router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
     Entries
         .findById(req.params.id)
         .exec()
         .then(entry => {
-            if (req.user.username === entry.author) 
+            if (req.user.username === entry.author)
                 res.json(entry.apiRepr());
             else
                 res.status(403).send();
@@ -81,12 +83,16 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
         return res.status(400).json(fieldMissing);
     }
 
-    Entries
-        .create({
-            title: req.body.title,
-            body: req.body.body,
-            author: req.user.username
-        })
+    categorize(req.body.title + ' ' + req.body.body)
+        .then(nlpTopics =>
+              Entries
+              .create({
+                  title: req.body.title,
+                  body: req.body.body,
+                  author: req.user.username,
+                  nlpTopics: nlpTopics
+              })
+             )
         .then(entry => {
             UserAccounts
                 .findOne({username: req.user.username})
@@ -112,18 +118,26 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
             updated[field] = req.body[field];
         }
     });
+
     Entries
     // make sure the author is the one editing the entry
         .findById(req.params.id)
         .then(entry => {
             if (req.user.username !== entry.author)
                 res.status(403).send(); // 403: Forbidden
+            return req.body.title || entry.title;
+        })
+        .then((title) => {
+            categorize(title + ' ' + req.body.body)
+                .then(nlpTopics => {
+                    updated.nlpTopics = nlpTopics;
+                    Entries
+                        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
+                        .exec()
+                        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
+                        .catch(err => res.status(500).json({message: 'Server Error'}));
+                });
         });
-    Entries
-        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
-        .exec()
-        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
-        .catch(err => res.status(500).json({message: 'Server Error'}));
 });
 
 router.delete('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {

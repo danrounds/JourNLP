@@ -6,6 +6,29 @@ var state = {
     current: null,
     resetCurrent: function() {
         state.current = state.entries[0];
+    },
+    globalTags: {},
+    // This lets us map from tagged topics back to the posts that were tagged
+    // with them. The rationale here is that we can group together common tags.
+    // 
+    // E.g., multiple posts might be given the tag "food."
+    // keys:   individual tags from nlpTopics, i.e. ...entry.nlpTopics[i]
+    // values: arrays of `entries' that contained the given tag.
+
+    sortTags: function() {
+        // this is the function that does the above mapping for us
+        state.entries.forEach(function(entry) {
+            entry.nlpTopics.forEach(function(tag) {
+                tag = tag.replace(/\n/g, '');
+                // NLP tagger is weird & includes newlines with edge-case input
+                var hasVal = state.globalTags[tag];
+                if (hasVal)
+                    state.globalTags[tag].push(entry);
+                else
+                    state.globalTags[tag] = [entry];
+            });
+        });
+        console.log(state.globalTags);
     }
 };
 
@@ -23,7 +46,6 @@ function findByIdAndRemove(id) {
 
     state.entries.splice( state.entries.indexOf(entry), 1 );
 }
-
 
 //// API-access functions
 function populateState() {
@@ -68,27 +90,31 @@ function deleteEntry(id) {
 
 
 //// Page updating functions (HTML and event handlers)
+function getQueryString() {
+    return document.location.search.substring(1);
+}
+
 function updateEntriesSidebar() {
     $('.sidebar').text('');
     state.entries.forEach(function(ent) {
         var p = ent.publishedAt;
         var e = ent.title;
         var b = ent.body;
-        var n = ent.NlpTopics;
+        var n = ent.nlpTopics;
         var link = ent.id;
         $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br/><br/>`);
     });
-    ;
 }
 
 function updateTagsSidebar() {
-    $('.tags-text').text('tags: ' + state.current.NlpTopics);
+    // write-entry.html AND view-entry.html
+    $('.tags-text').text('tags: ' + state.current.nlpTopics);
 }
 
 ////
 function addListingsButtonsProperties(id, title) {
+    // listings.html, subordinate
     // this adds properties to the individual entries on our entries screen
-    //  (listings.html)
 
     // view button
     $('#view_'+id).click(function() {
@@ -106,24 +132,52 @@ function addListingsButtonsProperties(id, title) {
         if (answer) {
             deleteEntry(id)
                 .catch(function() { window.open('listings.html', '_self'); });
-            // this isn't especially robust error handling; it just reloads the
+            //^this isn't especially robust error handling; it just reloads the
             // page if the deletion fails. I suppose so that the page reflects the
             // server's state
-
             findByIdAndRemove(id);
             updateListingsView();
         }
     });
 }
 
+function makeGlobalTagsHTML() {
+    // listings.html, subordinate
+    var tagsHtml = ''; var tagsArray = [];
+    for (var tagEntry in state.globalTags) {
+        tagsArray.push(`<a href="listings.html?${encodeURIComponent(tagEntry)}`
+                       +`">${tagEntry}</a>`);
+    }
+    return tagsArray.join(', ');
+}
+function getListings() {
+    // listings.html, subordinate
+    // returns the subset of entries for listings.html to display, and the
+    // correct title
+    var query = decodeURIComponent(getQueryString());
+    if (state.globalTags[query]) {
+        var entries = state.globalTags[query];
+        var title = `<h1>Entries for "${query}</h1>":`;
+    } else {
+        entries = state.entries;
+        title = `<h1>Entries:</h1>`;
+    }
+    return [title, entries];
+}
 function updateListingsView() {
-    $('.tags-text').text('HERE YOU NEED A FUNCTION TO GET THE GLOBAL TAGS');
-    $('.entries-list').text('');
-    state.entries.forEach(function(ent) {
+    // listings.html, main
+
+    var title, entries;
+    [title, entries] = getListings();
+
+    $('.tags-text').html(makeGlobalTagsHTML); // update global tags
+    $('.entries-list').html(title);
+
+    entries.forEach(function(ent) {
         var p = ent.publishedAt;
         var title = ent.title;
         var b = ent.body;
-        var n = ent.NlpTopics;
+        var n = ent.nlpTopics;
         var id = ent.id;
         $('.entries-list').append(
             `${p} ${title} ${b} ${n}<br/>`
@@ -134,11 +188,9 @@ function updateListingsView() {
     });
 }
 
-function queryStringId() {
-    return document.location.search.substring(1);
-}
 function updateEntryView() {
-    var id = queryStringId();
+    // view-entry.html, main
+    var id = getQueryString();
     if (id) {
         state.current = findById(id);
     };
@@ -148,7 +200,8 @@ function updateEntryView() {
 }
 
 function writeEditDisplayMain() {
-    var current = findById(queryStringId());
+    // write-entry.html, subordinate
+    var current = findById(getQueryString());
     if (!current) {
         $('h1').text('write an entry');
     } else {
@@ -158,6 +211,7 @@ function writeEditDisplayMain() {
     }
 }
 function writeEditButtons() {
+    // write-entry.html, subordinate
     var ans;
 
     // var initialTitle = $('#title-text').val();
@@ -189,12 +243,12 @@ function writeEditButtons() {
         else if (body.length === 0) { alert('Your entry needs an actual body'); }
 
         else {                  // we have an actual entry to submit
-            var id = queryStringId();
+            var id = getQueryString();
             if (id) {
                 editEntry({id: id, title: title, body: body});
             } else {
                 id = '';
-                submitEntry({title: title, body: body, author:'HARDCODED_REMOVE'});
+                submitEntry({title: title, body: body});
             }
             window.open(`view-entry.html?${id}`, '_self');
         }
@@ -205,21 +259,22 @@ function writeEditButtons() {
 function viewEntryUpdate() {
     populateState()
         .then(updateEntriesSidebar)
-        .then(updateTagsSidebar)
-        .then(updateEntryView);
+        .then(updateEntryView)
+        .then(updateTagsSidebar);
 }
 
 function writeEntryUpdate() {
     populateState()
         .then(updateEntriesSidebar)
-        .then(updateTagsSidebar)
         .then(writeEditDisplayMain)
+        .then(updateTagsSidebar)
         .then(writeEditButtons);
 }
 
 function listingsUpdate() {
     populateState()
-        .then(updateListingsView);
+        .done(state.sortTags)
+        .done(updateListingsView);
 }
 
 function dispatch() {
