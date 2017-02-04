@@ -6,6 +6,19 @@ var state = {
     current: null,
     resetCurrent: function() {
         state.current = state.entries[0];
+    },
+    globalTags: {},
+    sortTags: function(unsortedTags) {
+        unsortedTags.forEach(function(entry) {
+            entry.tags.forEach(function(tag) {
+                var temp = state.globalTags[tag];
+                if (temp)
+                    state.globalTags[tag].push(entry.id);
+                else
+                    state.globalTags[tag] = [entry.id];
+            });
+        });
+        console.log(state.globalTags);
     }
 };
 
@@ -24,13 +37,19 @@ function findByIdAndRemove(id) {
     state.entries.splice( state.entries.indexOf(entry), 1 );
 }
 
-
 //// API-access functions
 function populateState() {
     return $.getJSON('../api/entries')
         .done(function(data) {
             state.entries = data;
             state.resetCurrent();
+        });
+}
+
+function getTags() {
+    return $.getJSON('../api/user_account/tags')
+        .done(function(unsortedTags) {
+            state.sortTags(unsortedTags);
         });
 }
 
@@ -116,7 +135,9 @@ function addListingsButtonsProperties(id, title) {
 }
 
 function updateListingsView() {
-    $('.tags-text').text('HERE YOU NEED A FUNCTION TO GET THE GLOBAL TAGS');
+    // $('.tags-text').text(state.tags);
+
+    $('.tags-text').text(state.tags); // update global tags
     $('.entries-list').text('');
     state.entries.forEach(function(ent) {
         var p = ent.publishedAt;
@@ -204,21 +225,21 @@ function writeEditButtons() {
 function viewEntryUpdate() {
     populateState()
         .then(updateEntriesSidebar)
-        .then(updateTagsSidebar)
-        .then(updateEntryView);
+        .then(updateEntryView)
+        .then(updateTagsSidebar);
 }
 
 function writeEntryUpdate() {
     populateState()
         .then(updateEntriesSidebar)
-        .then(updateTagsSidebar)
         .then(writeEditDisplayMain)
+        .then(updateTagsSidebar)
         .then(writeEditButtons);
 }
 
 function listingsUpdate() {
-    populateState()
-        .then(updateListingsView);
+    $.when(populateState(), getTags())
+        .done(updateListingsView);
 }
 
 function dispatch() {
