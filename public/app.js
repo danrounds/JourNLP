@@ -78,7 +78,6 @@ function updateEntriesSidebar() {
         var link = ent.id;
         $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br/><br/>`);
     });
-    ;
 }
 
 function updateTagsSidebar() {
