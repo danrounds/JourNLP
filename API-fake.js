@@ -16,7 +16,7 @@ function makeEntry() {
             Fake.lorem.paragraph() + '\n\n' +
             Fake.lorem.paragraph() + '\n\n',
         author: Fake.internet.userName(),
-        NlpTopics: Fake.random.words(8),
+        nlpTopics: Fake.random.words(8),
         publishedAt: Fake.date.past()
         // lastupdatedAt: Fake.date.future()
     };
@@ -40,7 +40,7 @@ function initData() {
 function create(obj) {
     obj.id = Fake.random.uuid();
     obj.publishedAt = Fake.date.future();
-    obj.NlpTopics = Fake.random.words(8);
+    obj.nlpTopics = Fake.random.words(8);
     obj.publishedAt = Fake.date.past();
 
     entries.unshift(obj);

@@ -74,7 +74,7 @@ function updateEntriesSidebar() {
         var p = ent.publishedAt;
         var e = ent.title;
         var b = ent.body;
-        var n = ent.NlpTopics;
+        var n = ent.nlpTopics;
         var link = ent.id;
         $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br/><br/>`);
     });
@@ -82,7 +82,7 @@ function updateEntriesSidebar() {
 }
 
 function updateTagsSidebar() {
-    $('.tags-text').text('tags: ' + state.current.NlpTopics);
+    $('.tags-text').text('tags: ' + state.current.nlpTopics);
 }
 
 ////
@@ -123,7 +123,7 @@ function updateListingsView() {
         var p = ent.publishedAt;
         var title = ent.title;
         var b = ent.body;
-        var n = ent.NlpTopics;
+        var n = ent.nlpTopics;
         var id = ent.id;
         $('.entries-list').append(
             `${p} ${title} ${b} ${n}<br/>`

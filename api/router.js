@@ -90,7 +90,7 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
                   title: req.body.title,
                   body: req.body.body,
                   author: req.user.username,
-                  NlpTopics: nlpTopics
+                  nlpTopics: nlpTopics
               })
              )
         .then(entry => {
@@ -111,7 +111,7 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
     //         title: req.body.title,
     //         body: req.body.body,
     //         author: req.user.username,
-    //         NlpTopics: nlpTopics
+    //         nlpTopics: nlpTopics
     //     })
     //     .then(entry => {
     //         UserAccounts
@@ -150,7 +150,7 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
         .then((title) => {
             categorize(title + ' ' + req.body.body)
                 .then(nlpTopics => {
-                    updated.NlpTopics = nlpTopics;
+                    updated.nlpTopics = nlpTopics;
                     Entries
                         .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
                         .exec()
