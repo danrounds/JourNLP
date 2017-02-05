@@ -29,7 +29,15 @@ var state = {
             });
         });
         console.log(state.globalTags);
+    },
+    updateState:  function() {
+        // var id = getQueryString();
+        // if (getQueryString) {
+        //     state.current = findById(id);
+        // };
+        state.current = findById(getQueryString()) || state.current;
     }
+
 };
 
 function findById(id) {
@@ -95,19 +103,25 @@ function getQueryString() {
 }
 
 function updateEntriesSidebar() {
-    $('.sidebar').text('');
+    // write-entry.html AND view-entry.html
+    // updates the left pane on desktop--our listing of entries
+    // $('.sidebar').text('');
+    $('.entries-container').text('');
     state.entries.forEach(function(ent) {
         var p = ent.publishedAt;
         var e = ent.title;
         var b = ent.body;
         var n = ent.nlpTopics;
         var link = ent.id;
-        $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br/><br/>`);
+        // $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br/><br/>`);
+        $('.entries-container').append(`<div class="sidebar-entry"><a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a></div>`);
     });
 }
 
 function updateTagsSidebar() {
     // write-entry.html AND view-entry.html
+    // updates the right pane on desktop--our local document's tags
+    $('.tags-title').text(`tags for post "${state.current.title}"`);
     $('.tags-text').text('tags: ' + state.current.nlpTopics);
 }
 
@@ -160,7 +174,7 @@ function getListings() {
         var title = `<h1>Entries for "${query}</h1>":`;
     } else {
         entries = state.entries;
-        title = `<h1>Entries:</h1>`;
+        title = `<h1>Entries, all:</h1>`;
     }
     return [title, entries];
 }
@@ -170,6 +184,7 @@ function updateListingsView() {
     var title, entries;
     [title, entries] = getListings();
 
+    $('.tags-title').text('Global tags. Click one to see the relevant documents:');
     $('.tags-text').html(makeGlobalTagsHTML); // update global tags
     $('.entries-list').html(title);
 
@@ -190,10 +205,10 @@ function updateListingsView() {
 
 function updateEntryView() {
     // view-entry.html, main
-    var id = getQueryString();
-    if (id) {
-        state.current = findById(id);
-    };
+    // var id = getQueryString();
+    // if (id) {
+    //     state.current = findById(id);
+    // };
     $('.title').text(state.current.title);
     $('.entry').text(state.current.body);
     $('.entry-display').append(`<a href="write-entry.html?${state.current.id}">edit</a>`);
@@ -237,7 +252,8 @@ function writeEditButtons() {
 
     $('button#save').click(function(e) {
         e.preventDefault();
-        var title = $('#title-text').val(); var body = $('#body-text').val();
+        var title = $('#title-text').val().trim();
+        var body = $('#body-text').val().trim();
 
         if (title.length === 0) { alert('Your entry needs a title'); }
         else if (body.length === 0) { alert('Your entry needs an actual body'); }
@@ -258,6 +274,7 @@ function writeEditButtons() {
 //// high-level functions for our different screens
 function viewEntryUpdate() {
     populateState()
+        .then(state.updateState)
         .then(updateEntriesSidebar)
         .then(updateEntryView)
         .then(updateTagsSidebar);
@@ -265,9 +282,10 @@ function viewEntryUpdate() {
 
 function writeEntryUpdate() {
     populateState()
+        .then(state.updateState)
         .then(updateEntriesSidebar)
-        .then(writeEditDisplayMain)
         .then(updateTagsSidebar)
+        .then(writeEditDisplayMain)
         .then(writeEditButtons);
 }
 
