@@ -113,7 +113,7 @@ function updateEntriesSidebar() {
         var b = ent.body;
         var n = ent.nlpTopics;
         var link = ent.id;
-        // $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br/><br/>`);
+        // $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br><br>`);
         $('.entries-container').append(`<div class="sidebar-entry"><a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a></div>`);
     });
 }
@@ -180,6 +180,8 @@ function getListings() {
 }
 function updateListingsView() {
     // listings.html, main
+    // I don't like pushing styling into our JavaScript, but I'm using vanilla
+    // CSS; something like LESS would make this cleaner.
 
     var title, entries;
     [title, entries] = getListings();
@@ -195,10 +197,10 @@ function updateListingsView() {
         var n = ent.nlpTopics;
         var id = ent.id;
         $('.entries-list').append(
-            `${p} ${title} ${b} ${n}<br/>`
-                + `<button id="${'view_'+id}">view</button>`
-                + `<button id="${'edit_'+id}">edit</button>`
-                + `<button id="${'del_'+id}">delete</button><br/><br/>`);
+            `${p}<br>${title}<br>${b}<br>${n}<br>`
+                + `<button class="btn btn-primary" id="${'view_'+id}">view</button>`
+                + `<button class="btn btn-primary" id="${'edit_'+id}">edit</button>`
+                + `<button class="btn btn-primary" id="${'del_'+id}">delete</button><br><br>`);
         addListingsButtonsProperties(id, title);
     });
 }
@@ -267,6 +269,18 @@ function writeEditButtons() {
                 submitEntry({title: title, body: body});
             }
             window.open(`view-entry.html?${id}`, '_self');
+        }
+    });
+
+    $('button#delete').click(function(e) {
+        e.preventDefault();
+
+        var id = getQueryString();
+        if (findById(id)) {
+            if (confirm(`Are you sure you want to delete ${state.current.title}?`)){
+                deleteEntry(id);
+                window.open('write-entry.html', '_self');
+            }
         }
     });
 }
