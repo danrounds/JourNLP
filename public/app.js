@@ -28,7 +28,6 @@ var state = {
                     state.globalTags[tag] = [entry];
             });
         });
-        console.log(state.globalTags);
     },
     updateState:  function() {
         // var id = getQueryString();
@@ -37,7 +36,6 @@ var state = {
         // };
         state.current = findById(getQueryString()) || state.current;
     }
-
 };
 
 function findById(id) {
@@ -106,23 +104,30 @@ function updateEntriesSidebar() {
     // write-entry.html AND view-entry.html
     // updates the left pane on desktop--our listing of entries
     // $('.sidebar').text('');
-    $('.entries-container').text('');
+    // $('.entries-container').html('<h3 class="sidebar-entry">Entries:</h3>');
+
     state.entries.forEach(function(ent) {
-        var p = ent.publishedAt;
-        var e = ent.title;
-        var b = ent.body;
-        var n = ent.nlpTopics;
-        var link = ent.id;
+        // var p = ent.publishedAt;
+        // var e = ent.title;
+        // var b = ent.body;
+        // var n = ent.nlpTopics;
+        // var link = ent.id;
         // $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br><br>`);
-        $('.entries-container').append(`<div class="sidebar-entry"><a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a></div>`);
+        $('.entries-container').append(
+            `<div class="sidebar-entry"><a href="view-entry.html?${ent.id}">`
+                +`<h4 class="sidebar-title">${ent.title}</h4>`
+                +`<p class="line-limit sidebar-body">${ent.body}</p>`
+                +`<p class="line-limit sidebar-topics">${ent.nlpTopics}</p>`
+                +`<p>${ent.publishedAt}</p>`
+                +`</a></div>`);
     });
 }
 
 function updateTagsSidebar() {
     // write-entry.html AND view-entry.html
     // updates the right pane on desktop--our local document's tags
-    $('.tags-title').text(`tags for post "${state.current.title}"`);
-    $('.tags-text').text('tags: ' + state.current.nlpTopics);
+    $('.tags-title').text(`Tags for post "${state.current.title}":`);
+    $('.tags-text').text(state.current.nlpTopics);
 }
 
 ////
@@ -170,38 +175,52 @@ function getListings() {
     // correct title
     var query = decodeURIComponent(getQueryString());
     if (state.globalTags[query]) {
+        // we have a subset of entries
         var entries = state.globalTags[query];
-        var title = `<h1>Entries for "${query}</h1>":`;
+        var title = `Entries for "${query}":`;
+        var tail = true;
     } else {
+        // all the entries
         entries = state.entries;
-        title = `<h1>Entries, all:</h1>`;
+        title = `Entries, all:`;
     }
-    return [title, entries];
+    return [title, entries, tail];
 }
 function updateListingsView() {
     // listings.html, main
     // I don't like pushing styling into our JavaScript, but I'm using vanilla
     // CSS; something like LESS would make this cleaner.
 
-    var title, entries;
-    [title, entries] = getListings();
+    var title, entries, tail;
+    [title, entries, tail] = getListings();
 
+    $('h1').text(title);
     $('.tags-title').text('Global tags. Click one to see the relevant documents:');
     $('.tags-text').html(makeGlobalTagsHTML); // update global tags
-    $('.entries-list').html(title);
+    if (!tail)
+        $('.listings-link').text('');
 
+    var nEntries = 0;
     entries.forEach(function(ent) {
-        var p = ent.publishedAt;
-        var title = ent.title;
-        var b = ent.body;
-        var n = ent.nlpTopics;
         var id = ent.id;
+        if (!(nEntries % 2))
+            var containerOpenTag = '<div class="entry-listing even-entry">';
+        else
+            containerOpenTag = '<div class="entry-listing">';
         $('.entries-list').append(
-            `${p}<br>${title}<br>${b}<br>${n}<br>`
+            containerOpenTag
+                +`<h4>${ent.title}</h4>`
+                +`<p class="line-limit listing-body">${ent.body}</p>`
+                +`<p listing-topics><em>topics: </em>${ent.nlpTopics}</p>`
+                +`<p class="secondary">published: ${ent.publishedAt}</p>`
+            // buttons
                 + `<button class="btn btn-primary" id="${'view_'+id}">view</button>`
                 + `<button class="btn btn-primary" id="${'edit_'+id}">edit</button>`
-                + `<button class="btn btn-primary" id="${'del_'+id}">delete</button><br><br>`);
+                + `<button class="btn btn-primary" id="${'del_'+id}">delete</button>`
+            // closing tag
+                +'</div>');
         addListingsButtonsProperties(id, title);
+        nEntries++;
     });
 }
 
