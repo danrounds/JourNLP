@@ -28,7 +28,13 @@ var state = {
                     state.globalTags[tag] = [entry];
             });
         });
-        console.log(state.globalTags);
+    },
+    updateState:  function() {
+        // var id = getQueryString();
+        // if (getQueryString) {
+        //     state.current = findById(id);
+        // };
+        state.current = findById(getQueryString()) || state.current;
     }
 };
 
@@ -95,20 +101,33 @@ function getQueryString() {
 }
 
 function updateEntriesSidebar() {
-    $('.sidebar').text('');
+    // write-entry.html AND view-entry.html
+    // updates the left pane on desktop--our listing of entries
+    // $('.sidebar').text('');
+    // $('.entries-container').html('<h3 class="sidebar-entry">Entries:</h3>');
+
     state.entries.forEach(function(ent) {
-        var p = ent.publishedAt;
-        var e = ent.title;
-        var b = ent.body;
-        var n = ent.nlpTopics;
-        var link = ent.id;
-        $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br/><br/>`);
+        // var p = ent.publishedAt;
+        // var e = ent.title;
+        // var b = ent.body;
+        // var n = ent.nlpTopics;
+        // var link = ent.id;
+        // $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br><br>`);
+        $('.entries-container').append(
+            `<div class="sidebar-entry"><a href="view-entry.html?${ent.id}">`
+                +`<h4 class="sidebar-title">${ent.title}</h4>`
+                +`<p class="line-limit sidebar-body">${ent.body}</p>`
+                +`<p class="line-limit sidebar-topics">${ent.nlpTopics}</p>`
+                +`<p>${ent.publishedAt}</p>`
+                +`</a></div>`);
     });
 }
 
 function updateTagsSidebar() {
     // write-entry.html AND view-entry.html
-    $('.tags-text').text('tags: ' + state.current.nlpTopics);
+    // updates the right pane on desktop--our local document's tags
+    $('.tags-title').text(`Tags for post "${state.current.title}":`);
+    $('.tags-text').text(state.current.nlpTopics);
 }
 
 ////
@@ -156,44 +175,61 @@ function getListings() {
     // correct title
     var query = decodeURIComponent(getQueryString());
     if (state.globalTags[query]) {
+        // we have a subset of entries
         var entries = state.globalTags[query];
-        var title = `<h1>Entries for "${query}</h1>":`;
+        var title = `Entries for "${query}":`;
+        var tail = true;
     } else {
+        // all the entries
         entries = state.entries;
-        title = `<h1>Entries:</h1>`;
+        title = `Entries, all:`;
     }
-    return [title, entries];
+    return [title, entries, tail];
 }
 function updateListingsView() {
     // listings.html, main
+    // I don't like pushing styling into our JavaScript, but I'm using vanilla
+    // CSS; something like LESS would make this cleaner.
 
-    var title, entries;
-    [title, entries] = getListings();
+    var title, entries, tail;
+    [title, entries, tail] = getListings();
 
+    $('h1').text(title);
+    $('.tags-title').text('Global tags. Click one to see the relevant documents:');
     $('.tags-text').html(makeGlobalTagsHTML); // update global tags
-    $('.entries-list').html(title);
+    if (!tail)
+        $('.listings-link').text('');
 
+    var nEntries = 0;
     entries.forEach(function(ent) {
-        var p = ent.publishedAt;
-        var title = ent.title;
-        var b = ent.body;
-        var n = ent.nlpTopics;
         var id = ent.id;
+        if (!(nEntries % 2))
+            var containerOpenTag = '<div class="entry-listing even-entry">';
+        else
+            containerOpenTag = '<div class="entry-listing">';
         $('.entries-list').append(
-            `${p} ${title} ${b} ${n}<br/>`
-                + `<button id="${'view_'+id}">view</button>`
-                + `<button id="${'edit_'+id}">edit</button>`
-                + `<button id="${'del_'+id}">delete</button><br/><br/>`);
+            containerOpenTag
+                +`<h4>${ent.title}</h4>`
+                +`<p class="line-limit listing-body">${ent.body}</p>`
+                +`<p listing-topics><em>topics: </em>${ent.nlpTopics}</p>`
+                +`<p class="secondary">published: ${ent.publishedAt}</p>`
+            // buttons
+                + `<button class="btn btn-primary" id="${'view_'+id}">view</button>`
+                + `<button class="btn btn-primary" id="${'edit_'+id}">edit</button>`
+                + `<button class="btn btn-primary" id="${'del_'+id}">delete</button>`
+            // closing tag
+                +'</div>');
         addListingsButtonsProperties(id, title);
+        nEntries++;
     });
 }
 
 function updateEntryView() {
     // view-entry.html, main
-    var id = getQueryString();
-    if (id) {
-        state.current = findById(id);
-    };
+    // var id = getQueryString();
+    // if (id) {
+    //     state.current = findById(id);
+    // };
     $('.title').text(state.current.title);
     $('.entry').text(state.current.body);
     $('.entry-display').append(`<a href="write-entry.html?${state.current.id}">edit</a>`);
@@ -237,7 +273,8 @@ function writeEditButtons() {
 
     $('button#save').click(function(e) {
         e.preventDefault();
-        var title = $('#title-text').val(); var body = $('#body-text').val();
+        var title = $('#title-text').val().trim();
+        var body = $('#body-text').val().trim();
 
         if (title.length === 0) { alert('Your entry needs a title'); }
         else if (body.length === 0) { alert('Your entry needs an actual body'); }
@@ -253,11 +290,24 @@ function writeEditButtons() {
             window.open(`view-entry.html?${id}`, '_self');
         }
     });
+
+    $('button#delete').click(function(e) {
+        e.preventDefault();
+
+        var id = getQueryString();
+        if (findById(id)) {
+            if (confirm(`Are you sure you want to delete ${state.current.title}?`)){
+                deleteEntry(id);
+                window.open('write-entry.html', '_self');
+            }
+        }
+    });
 }
 
 //// high-level functions for our different screens
 function viewEntryUpdate() {
     populateState()
+        .then(state.updateState)
         .then(updateEntriesSidebar)
         .then(updateEntryView)
         .then(updateTagsSidebar);
@@ -265,9 +315,10 @@ function viewEntryUpdate() {
 
 function writeEntryUpdate() {
     populateState()
+        .then(state.updateState)
         .then(updateEntriesSidebar)
-        .then(writeEditDisplayMain)
         .then(updateTagsSidebar)
+        .then(writeEditDisplayMain)
         .then(writeEditButtons);
 }
 

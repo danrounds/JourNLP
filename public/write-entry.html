@@ -2,81 +2,99 @@
 <html>
   <head>
 	  <title>-- Write/Edit an Entry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" media="screen"/>
+
+    <link href="https://fonts.googleapis.com/css?family=Pangolin|Barrio" rel="stylesheet" type="text/css">
+
     <link rel="stylesheet" href="style.css" type="text/css" media="screen"/>
   </head>
   <body id="write-entry">
-    <div class="sidebar">
-      <a class="listings-link" href="listings.html">view all entries</a><br/>
 
-      <div class="sidebar-entry">
-        <a href="entry-link">
-          date TITLE<br/>
-          excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br/>
-          keywords: local, keywords, go, here
-        </a>
+    <div class="container">
+      <div class="row">
+
+        <div class="sidebar col-md-3">
+
+          <div class="entries-container">
+            <a class="new-entry" href="write-entry.html">New entry</a>
+            <h3 class="sidebar-heading">Entries:</h3>
+            <!-- <div class="sidebar-entry"> -->
+            <!--   <a href="entry-link"> -->
+            <!--     date TITLE<br> -->
+            <!--     excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br> -->
+            <!--     keywords: local, keywords, go, here -->
+            <!--   </a> -->
+            <!-- </div> -->
+
+            <!-- <div class="sidebar-entry"> -->
+            <!--   <a href="entry-link"> -->
+            <!--     date TITLE<br> -->
+            <!--     excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br> -->
+            <!--     keywords: local, keywords, go, here -->
+            <!--   </a> -->
+            <!-- </div> -->
+
+            <!-- <div class="sidebar-entry"> -->
+            <!--   <a href="entry-link"> -->
+            <!--     date TITLE<br> -->
+            <!--     excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br> -->
+            <!--     keywords: local, keywords, go, here -->
+            <!--   </a> -->
+            <!-- </div> -->
+
+            <!-- <div class="sidebar-entry"> -->
+            <!--   <a href="entry-link"> -->
+            <!--     date TITLE<br> -->
+            <!--     excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br> -->
+            <!--     keywords: local, keywords, go, here -->
+            <!--   </a> -->
+            <!-- </div> -->
+
+            <!-- <div class="sidebar-entry"> -->
+            <!--   <a href="entry-link"> -->
+            <!--     date TITLE<br> -->
+            <!--     excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br> -->
+            <!--     keywords: local, keywords, go, here -->
+            <!--   </a> -->
+            <!-- </div> -->
+          </div>
+        </div>
+
+        <div class="text-entry form-group col-md-6">
+          <h1>
+            <!-- write an entry -->
+          </h1>
+          <form action="#">
+            <label for="title-text">Title</label>
+            <input type="text" class="form-control" name="entry-title" id="title-text" placeholder="entry title"/>
+            <br>
+            <label for="body-text">Entry</label>
+            <textarea class="form-control" id="body-text" rows="30" cols="80" placeholder="Lacus vel facilisis volutpat, est velit egestas dui, id ornare! Duis at tellus at urna condimentum mattis pellentesque id nibh tortor, id aliquet lectus proin nibh nisl, condimentum id venenatis."></textarea>
+
+            <button class="btn-lg btn-primary pull-right" id="discard">discard entry</button>
+            <button class="btn-lg btn-primary pull-right" id="save">save & analyze</button>
+            <button class="btn-lg btn-primary pull-right" id="delete">delete</button>
+          </form>
+        </div>
+
+
+        <div class="tags-bar col-md-3">
+          <div class="tags-title">
+            <!-- Tags for: -->
+          </div>
+          <div class="tags-text">
+          <!--   tags: Local, document, tags, go, here, maecenas, volutpat, blandit, aliquam, etiam -->
+          </div>
+          <h3><a class="listings-link" href="listings.html">view all entries</a></h3>
+        </div>
+
       </div>
-
-      <div class="sidebar-entry">
-        <a href="entry-link">
-          date TITLE<br/>
-          excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br/>
-          keywords: local, keywords, go, here
-        </a>
-      </div>
-
-      <div class="sidebar-entry">
-        <a href="entry-link">
-          date TITLE<br/>
-          excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br/>
-          keywords: local, keywords, go, here
-        </a>
-      </div>
-
-      <div class="sidebar-entry">
-        <a href="entry-link">
-          date TITLE<br/>
-          excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br/>
-          keywords: local, keywords, go, here
-        </a>
-      </div>
-
-      <div class="sidebar-entry">
-        <a href="entry-link">
-          date TITLE<br/>
-          excerpt --- --. ---.- - -. - .-- .- -- - -.- - .-- - .-. -.- .- .-- -.<br/>
-          keywords: local, keywords, go, here
-        </a>
-      </div>
-
-
-
     </div>
-
-    <div class="text-entry">
-      <h1>write an entry</h1>
-      <!-- <form action="/api/entries" method="post"> -->
-      <form action="#">
-        <input type="text" name="entry-title" id="title-text" placeholder="entry title"/>
-        <br/>
-
-        <textarea name="" id="body-text" rows="30" cols="80" placeholder="Lacus vel facilisis volutpat, est velit egestas dui, id ornare! Duis at tellus at urna condimentum mattis pellentesque id nibh tortor, id aliquet lectus proin nibh nisl, condimentum id venenatis."></textarea>
-        <br/>
-
-        <!-- <button id="discard" type="reset">discard</button> -->
-        <!-- <button id="save" type="submit">save & analyze</button> -->
-        <button id="discard">discard</button>
-        <button id="save">save & analyze</button>
-      </form>
-    </div>
-
-    <div class="tags-bar">
-      <div class="tags-text">
-        tags: Local, document, tags, go, here, maecenas, volutpat, blandit, aliquam, etiam
-      </div>
-    </div>
-
+    
     <script src="https://code.jquery.com/jquery-3.1.1.js"> </script>
     <script src="app.js"></script>
-
   </body>
+
+
 </html>
