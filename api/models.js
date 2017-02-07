@@ -68,13 +68,13 @@ const userAccountSchema = mongoose.Schema({
 
 // userAccountSchema.methods.validatePassword = (password) => {
 userAccountSchema.methods.validatePassword = function(password) {
-    // return bcrypt
-    //     .compare(password, this.password)
-    //     .then(isValid => isValid);
-    return password === this.password;
+    return bcrypt
+        .compare(password, this.password)
+        .then(isValid => isValid);
+    // return password === this.password;
 };
 
-userAccountSchema.statics.hashPassword = (password) => {
+userAccountSchema.statics.hashPassword = function(password) {
     return bcrypt
         .hash(password, 10)
         .then(hash => hash);

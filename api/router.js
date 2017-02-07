@@ -59,8 +59,12 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
             entries = entries.posts;
             res.json(entries.map(entry => entry.apiRepr()));
         })
-        .then(userData => res.json(userData))
-        .catch(err => res.status(500).json({error: 'something went wrong'}));
+        // .then(userData => res.json(userData))
+        // .catch(err => res.status(500).json({error: 'something went wrong'}));
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({error: err});
+        });
 });
 
 router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
@@ -163,19 +167,22 @@ router.post('/user_account/', (req, res) => {
     if (fieldMissing) {
         return res.status(400).json({error: fieldMissing});
     }
-    UserAccounts
-        .create({
-            username: req.body.username,
-            password: req.body.password
-        })
-        .then(user => res.status(201).json(user))
-        .catch((err) => {
-            if (err.name == 'ValidationError')
-                res.status(422).json({message: err.errors.username.message});
-            else
-                // I'm not sure I want the server exposing whether accounts exist
-                res.status(500).json({message: 'Server error'});
-            });
+    return UserAccounts.hashPassword(req.body.password)
+        .then(hash => {
+              UserAccounts
+              .create({
+                  username: req.body.username,
+                  password: hash
+              })
+              .then(user => res.status(201).json(user))
+              .catch(err => {
+                  if (err.name == 'ValidationError')
+                      res.status(422).json({message: err.errors.username.message});
+                  else
+                      // I'm not sure I want the server exposing whether accounts exist
+                      res.status(500).json({message: err});
+              });
+        });
 });
 
 router.put('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
