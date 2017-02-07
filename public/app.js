@@ -54,6 +54,15 @@ function findByIdAndRemove(id) {
 }
 
 //// API-access functions
+function submitSignUp(data) {
+    return $.post({
+        url: '../api/user_account',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: 'application/json'
+    });
+}
+
 function populateState() {
     return $.getJSON('../api/entries')
         .done(function(data) {
@@ -304,6 +313,15 @@ function writeEditButtons() {
     });
 }
 
+function signUpForm() {
+    $('a#signup-submit').click(function(e) {
+        e.preventDefault();
+        submitSignUp({ username: $('#username').val().trim(),
+                       password: $('#password').val().trim() })
+            .done(function() { window.open(`write-entry.html?`, '_self'); });
+    });
+}
+
 //// high-level functions for our different screens
 function viewEntryUpdate() {
     populateState()
@@ -328,10 +346,15 @@ function listingsUpdate() {
         .done(updateListingsView);
 }
 
+function signUp() {
+    signUpForm();
+}
+
 function dispatch() {
     if ($('body#view-entry').length)  { viewEntryUpdate(); };
     if ($('body#write-entry').length) { writeEntryUpdate(); };
     if ($('body#listings').length)    { listingsUpdate(); };
+    if ($('body#sign-up').length)     { signUp(); };
 }
 
 $( dispatch );
