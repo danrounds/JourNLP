@@ -1,0 +1,79 @@
+.row-centered {
+    text-align:center;
+}
+
+.col-centered {
+    display:inline-block;
+    float:none;
+    /* reset the text-align */
+    text-align:left;
+    /* inline-block space fix */
+    margin-right:-4px;
+}
+
+.headlinks {
+    font-size: 20px;
+    font-family: 'Barrio';
+}
+
+.current {
+    /* background-color: #c70039; */
+    border-radius: 4px;
+    background-color: #ffc300;
+    color: lime;
+    text-shadow: 1px 0 white, -1px 0 white, 0 1px white, 0 -1px white;
+    text-shadow: 1.01px 0 #999, -1.01px 0 #999, 0 1.01px #999, 0 -1.01px #999;
+}
+
+
+.jumbotron {
+    background-color: white;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.project-name {
+    color: #777;
+}
+
+h1 {
+    text-align: center;
+}
+
+h2 {
+    font-size: 40px;
+}
+
+p {
+    font-size: 18px;
+}
+
+em {
+    font-weight: bold;;
+    font-style: normal;
+    color: #c70039;
+}
+
+.btn {
+    font-family: 'Barrio';
+    font-size: 24px;
+    text-shadow: 1px 0 #555, -1px 0 #555, 0 1px #555, 0 -1px #555;
+    border: 2px solid #900c3f;
+}
+
+.demo-button {
+    background-color: orange;
+    border-color: #ff5733;
+}
+
+.button-box {
+    margin-bottom: 25px;
+}
+
+/* a { */
+/*     display: inline-block; */
+/* } */
+
+/* .centered { */
+/*     margin: auto; */
+/* } */

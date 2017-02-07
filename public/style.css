@@ -1,4 +1,8 @@
-html, body, .container, .row {
+/* html, body, .container, .row { */
+/*     height: 100% */
+/* } */
+
+body, .container, .row {
     height: 100%
 }
 
