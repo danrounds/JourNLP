@@ -231,7 +231,7 @@ function updateListingsView() {
                 + `<button class="btn btn-primary" id="${'del_'+id}">delete</button>`
             // closing tag
                 +'</div>');
-        addListingsButtonsProperties(id, title);
+        addListingsButtonsProperties(id, ent.title);
         nEntries++;
     });
 }
