@@ -324,7 +324,8 @@ function signUpForm() {
         e.preventDefault();
         submitSignUp({ username: $('#username').val().trim(),
                        password: $('#password').val().trim() })
-            .done(function() { window.open(`write-entry.html?`, '_self'); });
+            .done(function() { window.open(`write-entry.html?`, '_self'); })
+            .fail(function() { alert(); });
     });
 }
 
