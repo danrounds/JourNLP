@@ -85,9 +85,6 @@ function editEntry(data) {
         url: '../api/entries/' + data.id,
         type: 'PUT',
         data: JSON.stringify(data),
-        // id: data.id,
-        // title: data.title,
-        // body: data.body,
         dataType: 'json',
         contentType: 'application/json'
     });
@@ -135,8 +132,14 @@ function updateEntriesSidebar() {
 function updateTagsSidebar() {
     // write-entry.html AND view-entry.html
     // updates the right pane on desktop--our local document's tags
-    $('.tags-title').text(`Tags for post "${state.current.title}":`);
-    $('.tags-text').text(state.current.nlpTopics);
+    if (state.current) {
+        var tags = state.current.nlpTopics;
+        $('.tags-title').text(`Tags for post "${state.current.title}":`);
+
+    } else
+        tags = 'Tags will appear once you\'ve <a href="write-entry.html">entered something.</a>';
+    $('.tags-text').html(tags);
+
 }
 
 ////
@@ -239,15 +242,18 @@ function updateEntryView() {
     // if (id) {
     //     state.current = findById(id);
     // };
-    $('.title').text(state.current.title);
-    $('.entry').text(state.current.body);
-    $('.entry-display').append(`<a href="write-entry.html?${state.current.id}">edit</a>`);
+    if (state.current) {
+        $('.title').text(state.current.title);
+        $('.entry').text(state.current.body);
+        $('.entry-display').append(`<a href="write-entry.html?${state.current.id}">edit</a>`);
+    }
 }
 
 function writeEditDisplayMain() {
     // write-entry.html, subordinate
     var current = findById(getQueryString());
     if (!current) {
+        $('button#delete').css({'display': 'none'});
         $('h1').text('write an entry');
     } else {
         $('h1').text('edit an entry');

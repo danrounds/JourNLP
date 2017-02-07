@@ -66,12 +66,10 @@ const userAccountSchema = mongoose.Schema({
     posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Entry'}]   // /journal entries/notes/whatever
 });
 
-// userAccountSchema.methods.validatePassword = (password) => {
 userAccountSchema.methods.validatePassword = function(password) {
     return bcrypt
         .compare(password, this.password)
         .then(isValid => isValid);
-    // return password === this.password;
 };
 
 userAccountSchema.statics.hashPassword = function(password) {
