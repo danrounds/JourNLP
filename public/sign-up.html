@@ -39,13 +39,20 @@
 
 	    <div class="login-form-1">
 		    <form id="login-form" enctype="application/json">
+
+          <div class="row row-centered">
+            <div class="col-md-4 col-centered">
+              <p id="username-taken" class="text-center"></p>
+            </div>
+          </div>
+
           <div class="row row-centered">
             <div class="col-md-4 col-centered">
               <label for="username" class="sr-only">Username</label>
-					    <input type="text" class="form-control" id="username" name="lusername" placeholder="username" required>
+					    <input type="text" class="form-control" id="username" name="lusername" placeholder="username" required autofocus>
             </div>
           </div>
-          
+
           <div class="row row-centered">
             <div class="col-md-4 col-centered">
 					    <label for="password" class="sr-only">Password</label>
@@ -60,13 +67,12 @@
           <!--   </div> -->
           <!-- </div> -->
 
-
           <div class="row row-centered">
             <div class="col-md-4 col-centered">
               <a id="signup-submit" class="btn btn-large btn-primary pull-right" href="#">sign-up!</a>
+              <!-- <input type="submit" value="Sign-up!" id="signup-submit" class="btn btn-large btn-primary pull-right"> -->
             </div>
           </div>
-
 
 		    </form>
 	    </div>

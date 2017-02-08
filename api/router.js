@@ -174,7 +174,7 @@ router.post('/user_account/', (req, res) => {
                         res.status(422).json({message: err.errors.username.message});
                     else
                         // I'm not sure I want the server exposing whether accounts exist
-                        res.status(500).json({message: err});
+                        res.status(500).json({message: 'Something went wrong'});
                 });
         });
 });

@@ -159,12 +159,6 @@ function updateEntriesSidebar() {
     // $('.entries-container').html('<h3 class="sidebar-entry">Entries:</h3>');
 
     state.entries.forEach(function(ent) {
-        // var p = ent.publishedAt;
-        // var e = ent.title;
-        // var b = ent.body;
-        // var n = ent.nlpTopics;
-        // var link = ent.id;
-        // $('.sidebar').append(`<a href="view-entry.html?${link}">${p} ${e} ${b} ${n}</a><br><br>`);
         $('.entries-container').append(
             `<div class="sidebar-entry"><a href="view-entry.html?${ent.id}">`
                 +`<h4 class="sidebar-title">${ent.title}</h4>`
@@ -328,7 +322,7 @@ function writeEditButtons() {
     $('button#discard').click(function(e) {
         e.preventDefault();
         if ($('#title-text').val().length !== 0 || $('#body-text').val().length !== 0) {
-            ans = confirm('Are you sure you want to discard your entry?');
+            ans = confirm('Are you sure you want to discard your changes?');
             if (ans) {
                 window.open('write-entry.html', '_self');
             }
@@ -370,11 +364,14 @@ function writeEditButtons() {
 
 function signUpForm() {
     $('a#signup-submit').click(function(e) {
-        e.preventDefault();
         submitSignUp({ username: $('#username').val().trim(),
                        password: $('#password').val().trim() })
             .done(function() { window.open(`write-entry.html?`, '_self'); })
-            .fail(function() { alert(); });
+            .fail(function(err) {
+                console.log(err);
+                if (err.status == 500)
+                    $('p#username-taken').text('looks like that username\'s taken!');
+                });
     });
 }
 
