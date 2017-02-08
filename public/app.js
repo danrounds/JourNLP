@@ -17,6 +17,7 @@ var state = {
 
     sortTags: function() {
         // this is the function that does the above mapping for us
+        state.globalTags = {};
         state.entries.forEach(function(entry) {
             entry.nlpTopics.forEach(function(tag) {
                 tag = tag.replace(/\n/g, '');
@@ -29,7 +30,7 @@ var state = {
             });
         });
     },
-    updateState:  function() {
+    updateState: function() {
         // var id = getQueryString();
         // if (getQueryString) {
         //     state.current = findById(id);
@@ -212,8 +213,13 @@ function addListingsButtonsProperties(id, title) {
             // page if the deletion fails. I suppose so that the page reflects the
             // server's state
             findByIdAndRemove(id);
+            state.sortTags();
             updateListingsView();
         }
+        // if (answer) {
+        //     deleteEntry(id);
+        //     window.open('listings.html', '_self');
+        // }
     });
 }
 
@@ -257,6 +263,7 @@ function updateListingsView() {
     if (!tail)
         $('.listings-link').text('');
 
+    $('.entries-list').html('');
     var nEntries = 0;
     entries.forEach(function(ent) {
         var id = ent.id;
@@ -279,6 +286,7 @@ function updateListingsView() {
         addListingsButtonsProperties(id, ent.title);
         nEntries++;
     });
+    return true;
 }
 
 function updateEntryView() {
