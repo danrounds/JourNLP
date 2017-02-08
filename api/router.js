@@ -18,18 +18,18 @@ const strategy = new BasicStrategy((username, password, cb) => {
     UserAccounts
         .findOne({username: username})
         .exec()
-        .then(_user => {
-            user = _user;
+        .then(user => {
             if (!user)
                 return cb(null, false, {message: 'Incorrect username'});
-            return user.validatePassword(password);
-        })
-        .then(isValid => {
-            if (!isValid)
-                return cb(null, false, {message: 'Incorrect password'});
-            return cb(null, user); // success!
+            return user.validatePassword(password)
+                .then(isValid => {
+                    if (!isValid)
+                        return cb(null, false, {message: 'Incorrect password'});
+                    return cb(null, user); // success!
+                });
         })
         .catch(err => cb(err));
+
 });
 
 passport.use(strategy);
