@@ -216,10 +216,6 @@ function addListingsButtonsProperties(id, title) {
             state.sortTags();
             updateListingsView();
         }
-        // if (answer) {
-        //     deleteEntry(id);
-        //     window.open('listings.html', '_self');
-        // }
     });
 }
 
