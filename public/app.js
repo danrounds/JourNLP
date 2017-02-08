@@ -54,9 +54,48 @@ function findByIdAndRemove(id) {
 }
 
 //// API-access functions
+
+/////// The following five functions are a hack that lets us log out AND use
+/////// a demo user account. I find them inelegant, but here they are.
+function getAuthVal() {
+    var re = new RegExp('Authorization' + "=([^;]+)");
+    var value = re.exec(document.cookie);
+    return (value != null) ? unescape(value[1]) : null;
+}
+
+function clearCredentials() {
+    if (getAuthVal() !== btoa('demo-account:abc123'))
+        document.cookie = 'Authorization=';
+}
+
+function setCredentials(username, password) {
+    var auth = btoa(`${username}:${password}`);
+    document.cookie = 'Authorization='+auth;
+}
+
+function setHeader(xhr) {
+    if (getAuthVal()) {
+        xhr.setRequestHeader('Authorization', 'Basic '+ getAuthVal());
+    }
+}
+
+function authenticatedReq(username, password) {
+    return $.ajax({
+        beforeSend: function(xhr) {
+            setCredentials(username, password);
+            setHeader(xhr);
+        },
+        type: 'GET',
+        url: '../api/entries'
+    });
+}
+//////
+
+
 function submitSignUp(data) {
     return $.post({
         url: '../api/user_account',
+        beforeSend: setHeader,
         data: JSON.stringify(data),
         dataType: 'json',
         contentType: 'application/json'
@@ -64,7 +103,10 @@ function submitSignUp(data) {
 }
 
 function populateState() {
-    return $.getJSON('../api/entries')
+    return $.getJSON({
+        url:'../api/entries',
+        beforeSend: setHeader
+    })
         .done(function(data) {
             state.entries = data;
             state.resetCurrent();
@@ -74,6 +116,7 @@ function populateState() {
 function submitEntry(data) {
     return $.post({
         url: '../api/entries',
+        beforeSend: setHeader,
         data: JSON.stringify(data),
         dataType: 'json',
         contentType: 'application/json'
@@ -83,6 +126,7 @@ function submitEntry(data) {
 function editEntry(data) {
     return $.ajax({
         url: '../api/entries/' + data.id,
+        beforeSend: setHeader,
         type: 'PUT',
         data: JSON.stringify(data),
         dataType: 'json',
@@ -93,6 +137,7 @@ function editEntry(data) {
 function deleteEntry(id) {
     return $.ajax({
         url: '../api/entries/' + id,
+        beforeSend: setHeader,
         type: 'DELETE',
         data: JSON.stringify({id: id}),
         dataType: 'json',
@@ -329,6 +374,26 @@ function signUpForm() {
     });
 }
 
+function logoutBind() {
+    // Here, we make a bad Basic Authentication request, and the resulting 401
+    // error status should convince our browser to flush existing credentials
+    $('a#logout-link').click(function(e) {
+        window.open(`index.html`, '_self');
+        authenticatedReq('A(W#JG(WJGAW(#JGW(#JGWJ#))))',
+                         '0aw3g98gj03aw9gja30wgn9jg0n3ajg03gwj' );
+    });
+}
+
+function demoLogin() {
+    // This is eventually to be replaced with server-generated, on-demand demo
+    // -accounts that we'll CRON-delete after some amount of inactivity
+    $('a#demo-button').click(function(e) {
+        e.preventDefault();
+        authenticatedReq('demo-account', 'abc123')
+            .done(function() { window.open('listings.html', '_self'); });
+    });
+}
+
 //// high-level functions for our different screens
 function viewEntryUpdate() {
     populateState()
@@ -358,10 +423,13 @@ function signUp() {
 }
 
 function dispatch() {
+    clearCredentials();
+    logoutBind();
     if ($('body#view-entry').length)  { viewEntryUpdate(); };
     if ($('body#write-entry').length) { writeEntryUpdate(); };
     if ($('body#listings').length)    { listingsUpdate(); };
     if ($('body#sign-up').length)     { signUp(); };
+    if ($('index'.length))            { demoLogin(); };
 }
 
 $( dispatch );

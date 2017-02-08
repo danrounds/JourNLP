@@ -59,12 +59,8 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
             entries = entries.posts;
             res.json(entries.map(entry => entry.apiRepr()));
         })
-        // .then(userData => res.json(userData))
-        // .catch(err => res.status(500).json({error: 'something went wrong'}));
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({error: err});
-        });
+        .then(userData => res.json(userData))
+        .catch(err => res.status(500).json({error: 'something went wrong'}));
 });
 
 router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
