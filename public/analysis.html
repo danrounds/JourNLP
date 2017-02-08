@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" media="screen"/>
 
     <link href="https://fonts.googleapis.com/css?family=Pangolin|Barrio" rel="stylesheet" type="text/css">
-
     <link rel="stylesheet" href="style.css" type="text/css" media="screen"/>
   </head>
   <body id="analysis">
@@ -25,18 +24,23 @@
       </div>
 
       <div class="row">
-        <div class="analysis" style="font-size:30px;margin-top:250px;margin-left:300px;">
-          analysis goes here
+        <div id="wordtree_basic" style="width: 900px; height: 500px;"></div>
+      </div>
+
+      <div class="row">
+        <div id="chart_div" style="width: 900px; height: 500px;"></div>
+      </div>
+
+      <div class="tags-bar">
+        <div class="tags-text">
+          tags: GLOBALLY, "scraped", tags, go, here, via, NLP, analysis, of, all, our, documents
         </div>
       </div>
 
-        <div class="tags-bar">
-          <div class="tags-text">
-            tags: GLOBALLY, "scraped", tags, go, here, via, NLP, analysis, of, all, our, documents
-          </div>
-        </div>
-
-      </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="app.js"></script>
+    <script src="visualization.js"></script>
   </body>
 </html>
