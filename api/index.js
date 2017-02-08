@@ -4,5 +4,6 @@
 // const {Entry} = require('./entry-model');
 const {Entry, UserAccount} = require('./models');
 const {router} = require('./router');
+const {nlpCategorize} = require('./nlp');
 
-module.exports = {Entry, UserAccount, router};
+module.exports = {Entry, UserAccount, router, nlpCategorize};

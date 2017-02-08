@@ -7,7 +7,7 @@ const {UserAccount, Entry} = require('./models');
 const Entries = Entry;          // I hate mongoose's naming conventions
 const UserAccounts = UserAccount;
 
-const {categorize} = require('./nlp');
+const {nlpCategorize} = require('./nlp');
 
 const router = express.Router();
 
@@ -20,15 +20,13 @@ const strategy = new BasicStrategy((username, password, cb) => {
         .exec()
         .then(_user => {
             user = _user;
-            if (!user) {
+            if (!user)
                 return cb(null, false, {message: 'Incorrect username'});
-            }
             return user.validatePassword(password);
         })
         .then(isValid => {
-            if (!isValid) {
+            if (!isValid)
                 return cb(null, false, {message: 'Incorrect password'});
-            }
             return cb(null, user); // success!
         })
         .catch(err => cb(err));
@@ -59,7 +57,7 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
             entries = entries.posts;
             res.json(entries.map(entry => entry.apiRepr()));
         })
-        .then(userData => res.json(userData))
+        // .then(userData => res.json(userData))
         .catch(err => res.status(500).json({error: 'something went wrong'}));
 });
 
@@ -76,14 +74,13 @@ router.get('/entries/:id', passport.authenticate('basic', {session: false}), (re
         .catch(err => res.status(500).json({error: 'Something went wrong'}));
 });
 
-
 router.post('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
     const fieldMissing = checkFields(req.body, ['title','body']);
     if (fieldMissing) {
         return res.status(400).json(fieldMissing);
     }
 
-    categorize(req.body.title + ' ' + req.body.body)
+    nlpCategorize(req.body.title + ' ' + req.body.body)
         .then(nlpTopics =>
               Entries
               .create({
@@ -128,7 +125,7 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
             return req.body.title || entry.title;
         })
         .then((title) => {
-            categorize(title + ' ' + req.body.body)
+            nlpCategorize(title + ' ' + req.body.body)
                 .then(nlpTopics => {
                     updated.nlpTopics = nlpTopics;
                     Entries
@@ -153,7 +150,8 @@ router.get('/user_account/', passport.authenticate('basic', {session: false}), (
     UserAccounts
         .findOne({username: req.user.username})
         .populate('posts')
-        .then(userData => res.json(userData))
+        // .then(userData => res.json(userData))
+        .then(userData => res.json(userData.apiRepr()))
         .catch(err => res.status(500).json({error: 'Something went wrong'}));
 });
 
@@ -165,19 +163,19 @@ router.post('/user_account/', (req, res) => {
     }
     return UserAccounts.hashPassword(req.body.password)
         .then(hash => {
-              UserAccounts
-              .create({
-                  username: req.body.username,
-                  password: hash
-              })
-              .then(user => res.status(201).json(user))
-              .catch(err => {
-                  if (err.name == 'ValidationError')
-                      res.status(422).json({message: err.errors.username.message});
-                  else
-                      // I'm not sure I want the server exposing whether accounts exist
-                      res.status(500).json({message: err});
-              });
+            UserAccounts
+                .create({
+                    username: req.body.username,
+                    password: hash
+                })
+                .then(user => res.status(201).json(user.apiRepr()))
+                .catch(err => {
+                    if (err.name == 'ValidationError')
+                        res.status(422).json({message: err.errors.username.message});
+                    else
+                        // I'm not sure I want the server exposing whether accounts exist
+                        res.status(500).json({message: err});
+                });
         });
 });
 

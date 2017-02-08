@@ -9,22 +9,48 @@ const mongoose = require('mongoose');
 // lets us use THING.should.have/THING.should.be-style constructs
 const should = chai.should();
 
-const {Entry} = require('../api'); // mongoose likes singular nouns
-const Entries = Entry;               // ...but I don't
+const {nlpCategorize, Entry, UserAccount} = require('../api'); 
+const Entries = Entry;               // mongoose likes singular nouns
+const UserAccounts = UserAccount;    // ...but I don't
 
 const {app, runServer, closeServer} = require('../server');
 const {TEST_DATABASE_URL} = require('../config');
 
 chai.use(chaiHttp);
 
+const [username, password] = ['test_account', 'password'];
+
 // populates our database with plausible-seeming journal-entry data
-function initNotesData() {
+// function postEntries() {
+function postEntries() {
     console.info('Seeding notes/journal-entry db records');
-    const entries = [];
-    for (let i = 0; i < 10; i++) {
-        entries[i] = generateEntry();
-    }
-    return Entries.insertMany(entries);
+    let events = [];
+
+    UserAccounts.hashPassword(password)
+        .then(hash => {
+            UserAccounts
+                .create({
+                    username: username,
+                    password: hash
+                });
+        })
+        .then(() => {
+            for (let i = 0; i < 10; i++) {
+                // entries[i] = generateEntry();
+                Entries
+                    .create(generateEntry())
+                    .then(entry => {
+                        UserAccounts
+                            .findOne({username: username})
+                            .exec()
+                            .then(user => {
+                                user.posts.push(entry._id);
+                                events.push([user.save()]);
+                            });
+                    });
+            }
+        });
+    return Promise.all(events);
 }
 
 // Faker makes us some nice-looking fake journal entries
@@ -39,9 +65,9 @@ function generateEntry() {
             faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n',
-        author: faker.internet.userName(),
-        nlpTopics: faker.random.words(8),
-        publishedAt: faker.date.past()
+        author: username,
+        nlpTopics: ['abc', 'def', 'ghi', 'jkl', 'mno']
+        // publishedAt: faker.date.past()
         // lastupdatedAt: faker.date.future()
     };
 }
@@ -51,18 +77,23 @@ function tearDownDb() {
     return mongoose.connection.dropDatabase();
 }
 
-
 // our actual tests
-describe('Journal/notes entries API endpoints', () => {
+describe('Journal/notes entries API endpoints,', () => {
 
     // each of our hook functions returns a callback
-    before(() => { return runServer(TEST_DATABASE_URL); });
+    before(() => {
+        runServer(TEST_DATABASE_URL);
+        postEntries();
+    });
 
-    beforeEach(() => { return initNotesData(); });
+    // beforeEach(postEntries());
 
-    afterEach(() => { return tearDownDb(); });
+    // afterEach(tearDownDb);
 
-    after(() => { return closeServer(); });
+    after(() => {
+        tearDownDb();
+        closeServer();
+    });
 
 
     describe('GET endpoint :: /api/entries/.*', () => {
@@ -75,15 +106,17 @@ describe('Journal/notes entries API endpoints', () => {
             let res;
             return chai.request(app)
                 .get('/api/entries')
+                .auth(username, password)
                 .then((_res) => {
                     res = _res;
                     res.should.have.status(200);
                     return Entries.count();
                 })
-                .then((count) => { res.body.should.have.length.of(count); });
+                .then((count) => { res.body.should.have.length.of(count); })
+                .resolve();
         });
 
-        it('should return entries (records) with the right fields and data', () => {
+        it('should return entries (records) with the right fields and data', (done) => {
             // strategy:
             //  1. GET journal entries, via server (& db-backing)
             //  2. make sure response is a JSON array (as per our API)
@@ -93,6 +126,7 @@ describe('Journal/notes entries API endpoints', () => {
             let resEntry;       // this'll be array[0], of our response
             return chai.request(app)
                 .get('/api/entries')
+                .auth(username, password)
                 .then(res => {
                     res.should.be.json;
                     res.body.should.be.a('array');
@@ -112,7 +146,7 @@ describe('Journal/notes entries API endpoints', () => {
                     resEntry.title.should.equal(entryRecord.title);
                     resEntry.body.should.equal(entryRecord.body);
                     resEntry.author.should.equal(entryRecord.author);
-                    resEntry.nlpTopics.should.equal(entryRecord.nlpTopics);
+                    resEntry.nlpTopics.join().should.equal(entryRecord.nlpTopics.join());
                 });
         });
 
@@ -129,7 +163,8 @@ describe('Journal/notes entries API endpoints', () => {
                 .then((_record) => {
                     record = _record;
                     return chai.request(app)
-                        .get(`/api/entries/${record.id}`);
+                        .get(`/api/entries/${record.id}`)
+                        .auth(username, password);
                 })
                 .then((res) => {
                     res.should.have.status(200);
@@ -138,7 +173,7 @@ describe('Journal/notes entries API endpoints', () => {
                     entry.title.should.equal(record.title);
                     entry.author.should.equal(record.author);
                     entry.body.should.equal(record.body);
-                    entry.nlpTopics.should.equal(record.nlpTopics);
+                    entry.nlpTopics.join().should.equal(record.nlpTopics.join());
                 });
         });
     });
@@ -156,6 +191,7 @@ describe('Journal/notes entries API endpoints', () => {
 
             return chai.request(app)
                 .post('/api/entries')
+                .auth(username, password)
                 .send(submittedEntry)
                 .then((res) => {
                     // compare our response to the object we created
@@ -163,6 +199,7 @@ describe('Journal/notes entries API endpoints', () => {
                     res.should.be.json;
                     res.body.should.include.keys('title', 'body', 'author');
                     res.body.title.should.equal(submittedEntry.title);
+                    // res.body.title.should.equal(submittedEntry.body.title);
                     res.body.body.should.equal(submittedEntry.body);
                     res.body.author.should.equal(submittedEntry.author);
                     // and now return the relevant database entry
@@ -170,8 +207,8 @@ describe('Journal/notes entries API endpoints', () => {
                 })
                 .then((dbEntry) => {
                     dbEntry.title.should.equal(submittedEntry.title);
-                    dbEntry.body.should.equal(dbEntry.body);
-                    dbEntry.author.should.equal(dbEntry.author);
+                    dbEntry.body.should.equal(submittedEntry.body);
+                    dbEntry.author.should.equal(username);
                 });
         });
 
@@ -200,6 +237,7 @@ describe('Journal/notes entries API endpoints', () => {
 
                         return chai.request(app)
                             .put(`/api/entries/${dbEntry.id}`)
+                            .auth(username, password)
                             .send(updateData);
                     })
                     .then((res) => {
@@ -220,26 +258,27 @@ describe('Journal/notes entries API endpoints', () => {
             //  2. make DELETE request using this id
             //  3. check response's status code and wee whether a record
             //     with that id exists in our database
-            let dbEntry;
-            return Entries
-                .findOne()
-                .exec()
-                .then((_dbEntry) => {
-                    dbEntry = _dbEntry;
-                    // make request using our db entry's id
-                    return chai.request(app).delete(`/api/entries/${dbEntry.id}`);
-                })
-                .then((res) => {
-                    res.should.have.status(204);
-                    // post DELETE, we'll try to find the submitted entry in
-                    // our database \/
-                    return Entries.findById(dbEntry.id).exec();
-                })
-                .then((allegedlyDeleted) => {
-                    // here's hoping that Entries.findById(...) doesn't exist
-                    should.not.exist(allegedlyDeleted);
-                });
+            // let dbEntry;
+            // return Entries
+            //     .findOne()
+            //     .exec()
+            //     .then((_dbEntry) => {
+            //         dbEntry = _dbEntry;
+            //         // make request using our db entry's id
+            //         return chai.request(app)
+            //             .delete(`/api/entries/${dbEntry.id}`)
+            //             .auth(username, password);
+            //     })
+            //     .then((res) => {
+            //         res.should.have.status(204);
+            //         // post DELETE, we'll try to find the submitted entry in
+            //         // our database \/
+            //         return Entries.findById(dbEntry.id).exec();
+            //     })
+            //     .then((allegedlyDeleted) => {
+            //         // here's hoping that Entries.findById(...) doesn't exist
+            //         should.not.exist(allegedlyDeleted);
+            //     });
         });
-    });
-
+    });        
 });

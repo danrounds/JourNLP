@@ -64,7 +64,7 @@ function getAuthVal() {
 }
 
 function clearCredentials() {
-    if (getAuthVal() !== btoa('demo-account:abc123'))
+    if (getAuthVal() !== btoa('demo_account:abc123'))
         document.cookie = 'Authorization=';
 }
 
@@ -389,7 +389,7 @@ function demoLogin() {
     // -accounts that we'll CRON-delete after some amount of inactivity
     $('a#demo-button').click(function(e) {
         e.preventDefault();
-        authenticatedReq('demo-account', 'abc123')
+        authenticatedReq('demo_account', 'abc123')
             .done(function() { window.open('listings.html', '_self'); });
     });
 }

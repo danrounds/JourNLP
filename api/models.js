@@ -3,6 +3,8 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
+mongoose.Promise = global.Promise;
+
 const notesEntrySchema = mongoose.Schema({
     title:{
         type: String,
@@ -78,16 +80,29 @@ userAccountSchema.statics.hashPassword = function(password) {
         .then(hash => hash);
 };
 
+userAccountSchema.methods.apiRepr = function() {
+    return {
+        id: this._id,
+        username: this.username,
+        posts: this.posts
+    };
+};
 
 
 // mongoose automagically pluralizes its model names for you. Thanks, mongoose!
 const Entry = mongoose.model('Entry', notesEntrySchema);
 const UserAccount = mongoose.model('UserAccount', userAccountSchema);
 
+// Create demo account for site demos:
 UserAccount
     .create({
-        account: 'test_account',
+        account: 'demo_account',
         password: 'abc123'
+    })
+    .catch(err => {
+        // we'll get this error if we've already added this account.
+           if (err.code == 11000)
+               return;
     });
 
 module.exports = {UserAccount, Entry};
