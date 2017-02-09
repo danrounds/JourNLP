@@ -46,11 +46,20 @@ function drawTree() {
 }
 
 function handleMap() {
-    $('li#map').click(drawMap);
+    $('li#map').click(function() {
+        drawMap();
+        $('#map').addClass('switched');
+        $('#tree').removeClass('switched');
+    });
 }
 
 function handleTree() {
-    $('li#tree').click(drawTree);
+    $('li#tree').click(function() {
+        drawTree();
+        $('#map').removeClass('switched');
+        $('#tree').addClass('switched');
+
+    });
 }
 
 $(function() {
