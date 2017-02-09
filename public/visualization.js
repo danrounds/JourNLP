@@ -59,7 +59,7 @@ $(function() {
             state.sortTags();
 
             if (state.entries.length < 6) {
-                $('p#results-warning').text('Warning: Results aren\'t very robust when you don\'t have very many entries');
+                $('p#results-warning').text('Warning: Results aren\'t very robust when you don\'t have many entries');
             }
 
             displayGlobalTags();
