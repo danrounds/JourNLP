@@ -31,10 +31,6 @@ var state = {
         });
     },
     updateState: function() {
-        // var id = getQueryString();
-        // if (getQueryString) {
-        //     state.current = findById(id);
-        // };
         state.current = findById(getQueryString()) || state.current;
     }
 };
@@ -282,10 +278,6 @@ function updateListingsView() {
 
 function updateEntryView() {
     // view-entry.html, main
-    // var id = getQueryString();
-    // if (id) {
-    //     state.current = findById(id);
-    // };
     if (state.current) {
         $('.title').text(state.current.title);
         $('.entry').text(state.current.body);
@@ -307,26 +299,25 @@ function writeEditDisplayMain() {
 }
 function writeEditButtons() {
     // write-entry.html, subordinate
-    var ans;
-
-    // var initialTitle = $('#title-text').val();
-    // var initialBody = $('body-text').val();
-
-    // $('a').click(function(e) {
-    //     e.preventDefault();
-    //     if (initialTitle !== $('#title-text') || initialBody !== $('#body-text')) {
-    //         ans = confirm('You\'re sure you don\'t want to save your changes?');
-    //     }
-    //     if (ans) { return true; } else { return false; }
-    // });
 
     $('button#discard').click(function(e) {
         e.preventDefault();
-        if ($('#title-text').val().length !== 0 || $('#body-text').val().length !== 0) {
-            ans = confirm('Are you sure you want to discard your changes?');
+
+        var ans;
+        var title = $('#title-text').val();
+        var body =  $('#body-text').val();
+        var inputs = findById(getQueryString()) || {};
+
+        // if (inputs.title === title && inputs.body === body) {
+        if (inputs.title === title && inputs.body === body) {
+            window.open(`view-entry.html?${getQueryString()}`, '_self');
+        } else if (title.length !== 0 || body.length !== 0) {
+            ans = confirm('Are you sure you want to discard your work?');
             if (ans) {
                 window.open('write-entry.html', '_self');
             }
+        } else {
+            alert('You haven\'t even entered anything, yet.');
         }
     });
 
@@ -339,10 +330,12 @@ function writeEditButtons() {
         e.preventDefault();
         var title = $('#title-text').val().trim();
         var body = $('#body-text').val().trim();
+        var inputs = findById(getQueryString()) || {};
 
         if (title.length === 0) { alert('Your entry needs a title'); }
         else if (body.length === 0) { alert('Your entry needs an actual body'); }
-
+        else if (inputs.title === title && inputs.body === body)
+            window.open(`view-entry.html?${getQueryString()}`, '_self');          
         else {                  // we have an actual entry to submit
             var id = getQueryString();
             if (id) {
@@ -386,7 +379,6 @@ function signUpForm() {
     }
 
 }
-
 
 function logoutBind() {
     // Here, we make a bad Basic Authentication request, and the resulting 401
