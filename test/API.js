@@ -112,8 +112,7 @@ describe('Journal/notes entries API endpoints,', () => {
                     res.should.have.status(200);
                     return Entries.count();
                 })
-                .then((count) => { res.body.should.have.length.of(count); })
-                .resolve();
+                .then((count) => { res.body.should.have.length.of(count); });
         });
 
         it('should return entries (records) with the right fields and data', (done) => {
