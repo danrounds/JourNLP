@@ -195,8 +195,8 @@ function addListingsButtonsProperties(id, title) {
 
     // delete button
     $('#del_'+id).click(function() {
-        var answer = confirm(`Are you sure you want to delete "${title}"?`);
-        if (answer) {
+        var ans = confirm(`Are you sure you want to delete "${title}"?`);
+        if (ans) {
             deleteEntry(id)
                 .catch(function() { window.open('listings.html', '_self'); });
             //^this isn't especially robust error handling; it just reloads the
@@ -304,14 +304,14 @@ function writeEditButtons() {
         e.preventDefault();
 
         var ans;
-        var title = $('#title-text').val();
-        var body =  $('#body-text').val();
+        var title = $('#title-text').val().trim();
+        var body =  $('#body-text').val().trim();
         var inputs = findById(getQueryString()) || {};
 
         // if (inputs.title === title && inputs.body === body) {
         if (inputs.title === title && inputs.body === body) {
             window.open(`view-entry.html?${getQueryString()}`, '_self');
-        } else if (title.length !== 0 || body.length !== 0) {
+        } else if (title.length || body.length) {
             ans = confirm('Are you sure you want to discard your work?');
             if (ans) {
                 window.open('write-entry.html', '_self');
@@ -361,6 +361,24 @@ function writeEditButtons() {
     });
 }
 
+function preventErasedComment() {
+    // This prevents hyperlinks from resolving if we've created or edited any
+    // content. Decent amount of overlap with the logic in `button#discard' in
+    // writeEditButtons()
+    $('body').on('click', 'a', function(e) {
+        e.preventDefault();
+
+        var title = $('#title-text').val().trim();
+        var body =  $('#body-text').val().trim();
+        var inputs = findById(getQueryString()) || {};
+
+        ans = true;
+        if (title || body || (inputs.title === title && inputs.body === body))
+            var ans = confirm(`Are you sure you want to discard your work?`);
+        ans && window.open($(this).attr('href'), '_self');
+    });
+}
+
 function signUpForm() {
     $('a#signup-submit').click(submitButton);
     $(document).keydown(function(e) {
@@ -372,7 +390,6 @@ function signUpForm() {
                        password: $('#password').val().trim() })
             .done(function() { window.open(`write-entry.html?`, '_self'); })
             .fail(function(err) {
-                console.log(err);
                 if (err.status == 500)
                     $('p#username-taken').text('looks like that username\'s taken!');
             });
@@ -415,7 +432,8 @@ function writeEntryUpdate() {
         .then(updateEntriesSidebar)
         .then(updateTagsSidebar)
         .then(writeEditDisplayMain)
-        .then(writeEditButtons);
+        .then(writeEditButtons)
+        .then(preventErasedComment);
 }
 
 function listingsUpdate() {
