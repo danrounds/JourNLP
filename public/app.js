@@ -331,10 +331,10 @@ function writeEditButtons() {
     });
 
     $('button#save').click(submit);
-    // $(document).keydown(function(e) {
-    //     if (e.ctrlKey && e.which === 13)
-    //         submit(e);
-    // });
+    $(document).keydown(function(e) {
+        if (e.ctrlKey && e.which === 13)
+            submit(e);
+    });
     function submit(e) {
         e.preventDefault();
         var title = $('#title-text').val().trim();
