@@ -213,15 +213,16 @@ function addListingsButtonsProperties(id, title) {
     });
 }
 
-function makeGlobalTagsHTML() {
+function displayGlobalTags() {
     // listings.html, subordinate
     var tagsHtml = ''; var tagsArray = [];
     for (var tagEntry in state.globalTags) {
         tagsArray.push(`<a href="listings.html?${encodeURIComponent(tagEntry)}`
                        +`">${tagEntry}</a>`);
     }
-    return tagsArray.join(', ');
+    $('.tags-text').html(tagsArray.join(', ')); // update global tags
 }
+
 function getListings() {
     // listings.html, subordinate
     // returns the subset of entries for listings.html to display, and the
@@ -249,7 +250,7 @@ function updateListingsView() {
 
     $('h1').text(title);
     $('.tags-title').text('Global tags. Click one to see the relevant documents:');
-    $('.tags-text').html(makeGlobalTagsHTML); // update global tags
+    displayGlobalTags();
     if (!tail)
         $('.listings-link').text('');
 
@@ -329,7 +330,12 @@ function writeEditButtons() {
         }
     });
 
-    $('button#save').click(function(e) {
+    $('button#save').click(submit);
+    // $(document).keydown(function(e) {
+    //     if (e.ctrlKey && e.which === 13)
+    //         submit(e);
+    // });
+    function submit(e) {
         e.preventDefault();
         var title = $('#title-text').val().trim();
         var body = $('#body-text').val().trim();
@@ -347,7 +353,7 @@ function writeEditButtons() {
             }
             window.open(`view-entry.html?${id}`, '_self');
         }
-    });
+    }
 
     $('button#delete').click(function(e) {
         e.preventDefault();
@@ -363,7 +369,12 @@ function writeEditButtons() {
 }
 
 function signUpForm() {
-    $('a#signup-submit').click(function(e) {
+    $('a#signup-submit').click(submitButton);
+    $(document).keydown(function(e) {
+        if (e.which === 13)
+            submitButton(e);
+    });
+    function submitButton(e) {
         submitSignUp({ username: $('#username').val().trim(),
                        password: $('#password').val().trim() })
             .done(function() { window.open(`write-entry.html?`, '_self'); })
@@ -371,9 +382,11 @@ function signUpForm() {
                 console.log(err);
                 if (err.status == 500)
                     $('p#username-taken').text('looks like that username\'s taken!');
-                });
-    });
+            });
+    }
+
 }
+
 
 function logoutBind() {
     // Here, we make a bad Basic Authentication request, and the resulting 401
