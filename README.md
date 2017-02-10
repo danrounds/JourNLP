@@ -1,6 +1,6 @@
 # JourNLP
 
-_JourNLP_ is a journaling/note-taking web app that automatically categorizes your notes for you, using Natural Language Process. Type in your notes, submit, and _JourNLP_ categorizes them with NLP. Identical topics are grouped together, and data from your notes can be visualized.
+_JourNLP_ is a journaling/note-taking web app that automatically categorizes your notes for you, using Natural Language Processing. Type in your notes, submit, and _JourNLP_ categorizes them with NLP. Identical topics are grouped together, and data from your notes can be visualized.
 
 ---------------------------------------------------------------
 
@@ -14,13 +14,14 @@ _JourNLP_ is a journaling/note-taking web app that automatically categorizes you
 * [Travis-CI](https://travis-ci.org/) for test automation
 * jQuery, for our client
 
-Sidebar patterns, courtesy [subtlepatterns.com](http://www.subtlepatterns.com); fonts and data visualization courtesy Google (Fonts and Charts, respectively).
+Sidebar patterns, courtesy [subtlepatterns.com](http://www.subtlepatterns.com).
+[Fonts](https://fonts.google.com/) and [data visualization](https://developers.google.com/chart/) courtesy Google.
 
 ---------------------------------------------------------------
 
 ## API
 
-The API here is RESTful (we manipulate the app and its data using basic HTTP requests and semantics). Most access involves [basic authentication](https://www.httpwatch.com/httpgallery/authentication/); the lone exception is account creation (`POST /user_account`). All request/response bodies are of type `application/json`.
+The API here is RESTful. Most access involves [basic authentication](https://www.httpwatch.com/httpgallery/authentication/); the lone exception is account creation (`POST /api/user_account`). All request/response bodies are of type `application/json`.
 
 The API endpoints for this project broadly do two things:
 
