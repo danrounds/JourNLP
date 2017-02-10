@@ -1,5 +1,4 @@
 # API, JourNLP
----------------------------------------------------------------
 
 The API here is RESTful (we manipulate the app and its data using basic HTTP requests and semantics). Most access involves [basic authentication](https://www.httpwatch.com/httpgallery/authentication/); the lone exception is account creation (`POST /api/user_account`). All request/response bodies are of type `application/json`.
 
@@ -14,7 +13,6 @@ Accordingly, our document is broken into two sections: [one about post endpoints
 Again, unless noted, all headers should include basic authentication (i.e., base-64-encoded `username:password`).
 
 ---------------------------------------------------------------
----------------------------------------------------------------
 
 ## Anatomy of a `post`
 
@@ -28,10 +26,7 @@ In this document, we'll refer to a journal/notes entry as a `post`. Our most oft
 * `nlpTopics`: An array of strings, representing the NLP tags that our back-end generates on post submission (i.e. the topics in the post)
 * `publishedAt`: A string representing the timestamp for when the post was submitted
 
----------------------------------------------------------------
-
 ## __`post`-oriented endpoints:__
-
 
 #### GET /api/entries/
 _This is our endpoint for getting a user's posts, in their entirety._
@@ -84,7 +79,6 @@ _For deleting a post, `id` = `:id`_. Once it's gone, it's gone! No takebacks.
     __Status:__ `500 Internal Server Error`
 
 ---------------------------------------------------------------
----------------------------------------------------------------
 
 ## Anatomy of an `account`
 `account`s are the data associated with an account. Our API includes methods to create accounts, change their passwords, delete them, and get user-pertinent data from them.
@@ -94,7 +88,6 @@ _For deleting a post, `id` = `:id`_. Once it's gone, it's gone! No takebacks.
 * `username`: Self-explanatory, globally unique (string)
 * `posts`: Array of `posts`. See [Anatomy of a `post`](#anatomy-of-a-post)]
 
----------------------------------------------------------------
 ## __`account`-oriented endpoints:__
 
 #### GET /api/user_account/
