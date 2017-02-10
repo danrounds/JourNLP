@@ -1,5 +1,4 @@
 # JourNLP
----------------------------------------------------------------
 
 _JourNLP_ is a journaling/note-taking web app that automatically categorizes your notes for you, using Natural Language Process. Type in your notes, submit, and _JourNLP_ categorizes them with NLP. Identical topics are grouped together, and data from your notes can be visualized.
 
