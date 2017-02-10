@@ -46,8 +46,9 @@ function checkFields(body, fields) {
 
 
 // ENDPOINTS:
+// /entries/.* endpoints
 router.get('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // this returns an array of notes entries
+    // this returns an array of the authenticated user's notes entries
     // add: sort-by-date
     UserAccounts
         .findOne({username: req.user.username}, 'posts')
@@ -57,11 +58,11 @@ router.get('/entries/', passport.authenticate('basic', {session: false}), (req, 
             entries = entries.posts;
             res.json(entries.map(entry => entry.apiRepr()));
         })
-        // .then(userData => res.json(userData))
         .catch(err => res.status(500).json({error: 'something went wrong'}));
 });
 
 router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
+    // this returns the entry with the specific id, assuming it belongs to the authenticated user
     Entries
         .findById(req.params.id)
         .exec()
@@ -75,6 +76,7 @@ router.get('/entries/:id', passport.authenticate('basic', {session: false}), (re
 });
 
 router.post('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
+    // submits/saves an entry, associated with the given user account
     const fieldMissing = checkFields(req.body, ['title','body']);
     if (fieldMissing) {
         return res.status(400).json(fieldMissing);
@@ -105,6 +107,7 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
 });
 
 router.put('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
+    // for editing an entry--either its `title' and/or its `body'
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
     }
@@ -138,6 +141,7 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
 });
 
 router.delete('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
+    // deletes the entry with the given id
     Entries
         .findByIdAndRemove(req.params.id)
         .exec()
@@ -145,12 +149,12 @@ router.delete('/entries/:id', passport.authenticate('basic', {session: false}), 
         .catch(err => res.status(500).json({error: 'Something went wrong'}));
 });
 
+// /user_account/ endpoints
 router.get('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // returns the entire Mongo document associated with the authenticated user
+    // returns the user-relevant data associated with the authenticated user
     UserAccounts
         .findOne({username: req.user.username})
         .populate('posts')
-        // .then(userData => res.json(userData))
         .then(userData => res.json(userData.apiRepr()))
         .catch(err => res.status(500).json({error: 'Something went wrong'}));
 });
@@ -191,7 +195,8 @@ router.put('/user_account/', passport.authenticate('basic', {session: false}), (
             {$set: {'password': req.body.newPassword}},
             {runValidators: true}
         )
-        .then((updated) => res.status(204).json(updated))
+        // .then((updated) => res.status(204).json(updated.apiRepr()))
+        .then((updated) => res.status(204))
         .catch(err => res.status(500).json({message: 'Server error'}));
 });
 
