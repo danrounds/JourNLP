@@ -24,6 +24,7 @@ Sidebar patterns, courtesy [subtlepatterns.com](http://www.subtlepatterns.com); 
 The API here is RESTful (we manipulate the app and its data using basic HTTP requests and semantics). Most access involves [basic authentication](https://www.httpwatch.com/httpgallery/authentication/); the lone exception is account creation (`POST /user_account`). All request/response bodies are of type `application/json`.
 
 The API endpoints for this project broadly do two things:
+
 1. CRUD notes entries&#8212;that is (1) make posts, (2) access post data, (3) update posts, and (4) delete posts data
 2. CRUD user accounts&#8212;i.e., (1) create user accounts, (2) get access to all the data associated with a user account, (3) change a user password, and (4) delete an account and all associated data
 
