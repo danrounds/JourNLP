@@ -30,52 +30,52 @@ In this document, we'll refer to a journal/notes entry as a `post`. Our most oft
 
 #### GET /api/entries/
 _This is our endpoint for getting a user's posts, in their entirety._
-* ##### Request
+* Request
     Authenticated (BA) GET request
-* ##### _Success:_
+* _Success:_
     __Status:__ `200 OK`. 
     __Body:__ Array of [`post`s](#anatomy-of-a-post).
-* ##### _Failure:_
+* _Failure:_
     __Statuses:__ `500 Internal Server Error`
 
 #### GET /api/entries/:id
 _Our endpoint for getting a single post (with `id` = `:id`)_
-* ##### Request
+*  Request
     __URL:__ `:id` refers to a post id
-* ##### _Success:_
+*  _Success:_
     __Status:__ `200 OK`. 
     __Body:__ A single [`post`](#anatomy-of-a-post).
-* ##### _Failure:_
+*  _Failure:_
     __Statuses:__ `403 Forbidden` if the API user is trying to access a post not belonging to her. `500 Internal Server Error` otherwise.
 
 #### POST /api/entries/
 _This endpoint creates a [`post`](#anatomy-of-a-post), with all the keys you'd expect, including `nlpTopics`_ That is, it submits text to our server, saves it, and our server analyzes it.
-* ##### Request
+*  Request
     __Body:__ JSON object, with keys `title` and `body`
-* ##### _Success:_
+*  _Success:_
     __Status:__ `201 Created`
     __Body:__ [`post`](#anatomy-of-a-post) object
-* ##### _Failure:_
+*  _Failure:_
     __Status:__ `500 Internal Server Error`
 
 #### PUT /api/entries/:id
 _This endpoint is for editing a [`post`](#anatomy-of-a-post), with `id` = `:id`_
-* ##### Request
+*  Request
     __URL:__ `:id` refers to post id
     __Body:__ JSON object, with keys `id` = `:id` in the URL (required), and one or both of `title`, `body`
-* ##### _Success:_
+*  _Success:_
     __Status:__ `201 Created`
     __Body:__ the newly edited [`post`](#anatomy-of-a-post)
-* ##### _Failure:_
+*  _Failure:_
     __Statuses:__ `403 Forbidden` or `500 Internal Server Error`
 
 #### DELETE /api/entries/:id
 _For deleting a post, `id` = `:id`_. Once it's gone, it's gone! No takebacks.
-* ##### Request
+*  Request
     __URL:__ `:id` refers to post id
-* ##### _Success:_
+*  _Success:_
     __Status:__ `204 No Content`
-* ##### _Failure:_
+*  _Failure:_
     __Status:__ `500 Internal Server Error`
 
 ---------------------------------------------------------------
@@ -92,39 +92,39 @@ _For deleting a post, `id` = `:id`_. Once it's gone, it's gone! No takebacks.
 
 #### GET /api/user_account/
 Endpoint returns [`account`](#anatomy-of-an-account) associated with the request's authentication (username:password).
-##### Request
+ Request
     Just an authenticated request to this URL
-##### _Success:_
+ _Success:_
     __Status:__ `200 OK`
     __Body:__ [`account`](#anatomy-of-an-account) object associated with the authenticated credentials
-##### _Failure:_
+ _Failure:_
     __Status:__ `500 Internal Server Error`
 
 #### POST /api/user_account/
 Endpoint is for creating an account. _This is the lone endpoint of our API that doesn't require authentication._
-* ##### Request
+*  Request
     __Body:__ JSON object with fields `username` and `password` (strings). `username` must be globally unique.
-* ##### _Success:_
+*  _Success:_
     __Status:__ `201 Created`
     __Body:__ [`account`](#anatomy-of-an-account) object with the `username` we just created. The `password` is stored in our database, but isn't exposed to the user.
-* ##### _Failure:_
+*  _Failure:_
     __Statuses:__ `400 Bad Request` for missing required fields in the request body, `422 Unprocessable Entity` for a redundant username, `500 Internal Server Error` for everything else.
 
 #### PUT /api/user_account/
 Endpoint is for changing an account's password
-* ##### Request
+*  Request
     __Body:__ required fields `username`, `password`
-* ##### _Success:_
+*  _Success:_
     __Status:__ `204 No Content`
-* ##### _Failure:_
+*  _Failure:_
     __Statuses:__ `400 Bad Request` for missing fields. `500 Internal Server Error` for everything else.
 
 #### DELETE /api/user_account/
 Deletes an account and all the data associated with it. This is permanent.
-* ##### Request
+*  Request
     Just a BA authenticated request
-* ##### _Success:_
+*  _Success:_
     __Status:__ `204 No Content`
-* ##### _Failure:_
+*  _Failure:_
     __Status:__ `500 Internal Server Error`
     
