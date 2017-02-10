@@ -370,11 +370,12 @@ function preventErasedComment() {
 
         var title = $('#title-text').val().trim();
         var body =  $('#body-text').val().trim();
-        var inputs = findById(getQueryString()) || {};
+        var inputs = findById(getQueryString()) || { title: '', body: '' };
 
         ans = true;
-        if (title || body || (inputs.title === title && inputs.body === body))
+        if (inputs.title !== title || inputs.body !== body) {
             var ans = confirm(`Are you sure you want to discard your work?`);
+        }
         ans && window.open($(this).attr('href'), '_self');
     });
 }
