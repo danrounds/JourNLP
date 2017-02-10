@@ -92,12 +92,12 @@ _For deleting a post, `id` = `:id`_. Once it's gone, it's gone! No takebacks.
 
 #### GET /api/user_account/
 Endpoint returns [`account`](#anatomy-of-an-account) associated with the request's authentication (username:password).
-* ##### Request
+##### Request
     Just an authenticated request to this URL
-* ##### _Success:_
+##### _Success:_
     __Status:__ `200 OK`
     __Body:__ [`account`](#anatomy-of-an-account) object associated with the authenticated credentials
-* ##### _Failure:_
+##### _Failure:_
     __Status:__ `500 Internal Server Error`
 
 #### POST /api/user_account/
