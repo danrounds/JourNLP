@@ -26,6 +26,7 @@ In this document, we'll refer to a journal/notes entry as a `post`. Our most oft
 * `nlpTopics`: An array of strings, representing the NLP tags that our back-end generates on post submission (i.e. the topics in the post)
 * `publishedAt`: A string representing the timestamp for when the post was submitted
 
+---------------------------------------------------------------
 ## __`post`-oriented endpoints:__
 
 #### GET /api/entries/
@@ -88,6 +89,7 @@ _For deleting a post, `id` = `:id`_. Once it's gone, it's gone! No takebacks.
 * `username`: Self-explanatory, globally unique (string)
 * `posts`: Array of `posts`. See [Anatomy of a `post`](#anatomy-of-a-post)]
 
+---------------------------------------------------------------
 ## __`account`-oriented endpoints:__
 
 #### GET /api/user_account/
