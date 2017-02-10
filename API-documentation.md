@@ -45,7 +45,7 @@ Authenticated (BA) GET request
 
 #### Failure:
 
-__Statuses:__ `500 Internal Server Error`
+* __Statuses:__ `500 Internal Server Error`
 
 ---------------------------------------------------------------
 
@@ -54,7 +54,7 @@ _Our endpoint for getting a single post (with `id` = `:id`)_
 
 ####  Request
 
-__URL:__ `:id` refers to a post id
+* __URL:__ `:id` refers to a post id
 
 ####  _Success:_
 * __Status:__ `200 OK`. 
