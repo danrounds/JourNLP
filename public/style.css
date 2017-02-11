@@ -1,5 +1,5 @@
 body {
-    background-image: url('patterns/sakura.gif');
+    background-image: url('patterns/sakura.gif'); /* via http://www.dinpattern.com/*/
 }
 
 .container {
@@ -53,7 +53,7 @@ a:hover {
 }
 
 .sidebar, .even-entry {
-    background-image: url('patterns/ignasi_pattern_s.png');
+    background-image: url('patterns/ignasi_pattern_s.png'); /* via http://www.subtlepatterns.com */
 }
 
 .new-entry {
@@ -105,7 +105,7 @@ a:hover {
 }
 
 .tags-bar {
-    background-image: url('patterns/sayagata-400px.png');
+    background-image: url('patterns/sayagata-400px.png'); /* via http://www.subtlepatterns.com */
 }
 
 /* textarea { */
