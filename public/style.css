@@ -1,3 +1,11 @@
+body {
+    background-image: url('patterns/sakura.gif');
+}
+
+.container {
+    background-color: white;
+}
+
 .row-eq-height {
     /* from: http://getbootstrap.com.vn/examples/equal-height-columns/ */
     display: -webkit-box;

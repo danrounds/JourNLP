@@ -14,7 +14,7 @@ _JourNLP_ is a journaling/note-taking web app that automatically categorizes you
 * [Travis-CI](https://travis-ci.org/) for test automation
 * jQuery, for our client
 
-Sidebar patterns, courtesy [subtlepatterns.com](http://www.subtlepatterns.com).
+Sidebar patterns, courtesy [subtlepatterns.com](http://www.subtlepatterns.com) and [dinpattern.com](http://www.dinpattern.com/).
 [Fonts](https://fonts.google.com/) and [data visualization](https://developers.google.com/chart/) courtesy Google.
 
 ---------------------------------------------------------------
