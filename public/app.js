@@ -335,7 +335,7 @@ function writeEditButtons() {
         if (title.length === 0) { alert('Your entry needs a title'); }
         else if (body.length === 0) { alert('Your entry needs an actual body'); }
         else if (inputs.title === title && inputs.body === body)
-            window.open(`view-entry.html?${getQueryString()}`, '_self');          
+            window.open(`view-entry.html?${getQueryString()}`, '_self');
         else {                  // we have an actual entry to submit
             var id = getQueryString();
             if (id) {
