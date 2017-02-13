@@ -41,7 +41,9 @@ const base = {
 };
 function createDemoAccount() {
     const req = {
-        url: `http://localhost:${PORT}/api/user_account`,
+        // url: `http://localhost:${PORT}/api/user_account`,
+        url: `http://localhost:14866/api/user_account`,
+        // url: `http://localhost/api/user_account`,
         body: JSON.stringify({
             username: username,
             password: password
@@ -53,7 +55,9 @@ function createDemoAccount() {
 function postPost(post) {
     // this will, um...POST a post
     const req = {
-        url: `http://localhost:${PORT}/api/entries`,
+        // url: `http://localhost:${PORT}/api/entries`,
+        url: `http://localhost:14866/api/entries`,
+        // url: `http://localhost/api/entries`,
         auth: {
             user: username,
             password: password
@@ -62,6 +66,65 @@ function postPost(post) {
     };
     return request(Object.assign(req, base));
 }
+
+function createPosts() {
+    console.log('Creating posts...');
+    for (let post of data)
+        postPost(post);
+}
+
+console.log(`DATABASE_URL: ${DATABASE_URL}`);
+
+connectMongo() // need to actually create a server instance,
+    .then(dropDemoAccount) // so we can interact with the database
+    .then(createDemoAccount)
+    .then(createPosts)
+    .then(disconnectMongo)
+    .catch(err => console.log(err));
+
+
+
+
+
+
+
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+// DATA GO HERE //////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+//////////////////////////////////
+// \/ \/ \/ \/ \/ \/ \/ \/ \/ \///
+
+
+
+
+
 
 const data = [
     {title: `Music`, body: `Music is a form of art. Music is also a form of entertainment that puts sounds together in a way that people like or find interesting. Most music includes people singing with their voices or playing musical instruments, such as the piano, guitar, or drums.
@@ -131,19 +194,3 @@ In the late 1970s and early 1980s, a type of nightclub dance music called Disco 
 The orchestra is directed by a conductor. He/she helps the players to play together, to get the right balance so that everything can be heard clearly, and to encourage the orchestra to play with the same kind of feeling. Some small chamber orchestras may play without a conductor. This was usual until the 19th century when the orchestras got very big and needed a conductor who made decisions and stood in front so that all the players could see him.
 `},
 ];
-
-function createPosts() {
-    console.log('Creating posts...');
-    for (let post of data)
-        postPost(post);
-}
-
-console.log(`DATABASE_URL: ${DATABASE_URL}`);
-
-connectMongo() // need to actually create a server instance,
-    .then(dropDemoAccount) // so we can interact with the database
-    .then(createDemoAccount)
-    .then(createPosts)
-    .then(disconnectMongo)
-    .catch(err => console.log(err));
-
