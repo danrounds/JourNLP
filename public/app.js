@@ -4,8 +4,10 @@
 var state = {
     entries: [],
     current: null,
+    author: '',
     resetCurrent: function() {
         state.current = state.entries[0];
+        state.author = state.entries[0].author;
     },
     globalTags: {},
     // This lets us map from tagged topics back to the posts that were tagged
@@ -401,7 +403,9 @@ function signUpForm() {
 function logoutBind() {
     // Here, we make a bad Basic Authentication request, and the resulting 401
     // error status should convince our browser to flush existing credentials
-    $('a#logout-link').click(function(e) {
+    $('a#logout-link')
+        .text(`${state.author}, logout`)
+        .click(function(e) {
         window.open(`index.html`, '_self');
         authenticatedReq('A(W#JG(WJGAW(#JGW(#JGWJ#))))',
                          '0aw3g98gj03aw9gja30wgn9jg0n3ajg03gwj' );
@@ -420,41 +424,43 @@ function demoLogin() {
 
 //// high-level functions for our different screens
 function viewEntryUpdate() {
-    populateState()
+    return populateState()
         .then(state.updateState)
         .then(updateEntriesSidebar)
         .then(updateEntryView)
-        .then(updateTagsSidebar);
+        .then(updateTagsSidebar)
+        .then(logoutBind);
 }
 
 function writeEntryUpdate() {
-    populateState()
+    return populateState()
         .then(state.updateState)
         .then(updateEntriesSidebar)
         .then(updateTagsSidebar)
         .then(writeEditDisplayMain)
         .then(writeEditButtons)
-        .then(preventErasedComment);
+        .then(preventErasedComment)
+        .then(logoutBind);
 }
 
 function listingsUpdate() {
-    populateState()
+    return populateState()
         .done(state.sortTags)
-        .done(updateListingsView);
+        .done(updateListingsView)
+        .then(logoutBind);
 }
 
 function signUp() {
-    signUpForm();
+    return signUpForm();
 }
 
 function dispatch() {
     clearCredentials();
-    logoutBind();
     if ($('body#view-entry').length)  { viewEntryUpdate(); };
     if ($('body#write-entry').length) { writeEntryUpdate(); };
     if ($('body#listings').length)    { listingsUpdate(); };
     if ($('body#sign-up').length)     { signUp(); };
-    if ($('index'.length))            { demoLogin(); };
+    if ($('index'.length))            { demoLogin(); }
 }
 
 $( dispatch );

@@ -1,6 +1,6 @@
 'use strict';
 
-var state, google, populateState, $, displayGlobalTags;
+var state, google, populateState, $, displayGlobalTags, logoutBind;
 
 function drawMap() {
     var array =         [  ['Words',  'Parent', 'Frequency'],
@@ -72,6 +72,7 @@ $(function() {
             }
 
             displayGlobalTags();
+            logoutBind();
 
             google.charts.load('current', {packages:['wordtree', 'treemap']});
             google.charts.setOnLoadCallback(handleMap);
