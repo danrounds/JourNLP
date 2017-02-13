@@ -138,6 +138,8 @@ function createPosts() {
         postPost(post);
 }
 
+console.log(`DATABASE_URL: ${DATABASE_URL}`);
+
 connectMongo() // need to actually create a server instance,
     .then(dropDemoAccount) // so we can interact with the database
     .then(createDemoAccount)
