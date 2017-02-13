@@ -58,7 +58,9 @@ function closeServer() {
 
 // if we call server.js, directly (`node server.js'). this block runs
 if (require.main === module) {
-    runServer().catch(err => console.error(err));
+    runServer()
+        .then(() => console.log(server.address()))
+        .catch(err => console.error(err));
 }
 
 // we export runServer and closeServer so that other code (right now, just
