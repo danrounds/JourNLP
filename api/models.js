@@ -93,16 +93,4 @@ userAccountSchema.methods.apiRepr = function() {
 const Entry = mongoose.model('Entry', notesEntrySchema);
 const UserAccount = mongoose.model('UserAccount', userAccountSchema);
 
-// Create demo account for site demos:
-UserAccount
-    .create({
-        account: 'demo_account',
-        password: 'abc123'
-    })
-    .catch(err => {
-        // we'll get this error if we've already added this account.
-           if (err.code == 11000)
-               return;
-    });
-
 module.exports = {UserAccount, Entry};

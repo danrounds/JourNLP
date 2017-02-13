@@ -201,12 +201,18 @@ router.put('/user_account/', passport.authenticate('basic', {session: false}), (
 });
 
 router.delete('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // deletes the authenticated user account
-    UserAccounts
-        .remove({username: req.user.username})
-        .exec()
+    // deletes entries and the authenticated user account
+    const p1 = Entries
+              .remove({author: req.user.username})
+              .exec();
+    const p2 = UserAccounts
+              .remove({username: req.user.username})
+              .exec();
+
+    Promise.all([p1, p2])
         .then(() => res.status(204).send()) // Success!
         .catch(err => res.status(500).json({error: 'Server error'}));
 });
+
 
 module.exports = {router};
