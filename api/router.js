@@ -49,13 +49,14 @@ function checkFields(body, fields) {
 // /entries/.* endpoints
 router.get('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
     // this returns an array of the authenticated user's notes entries
-    // add: sort-by-date
+    // The simplest way to add entries (see, POST) is to just push onto the end
+    // of an array of post ids; the result is sorted with oldest posts, first.
+    // This isn't quite what we want, hence `entries.posts.reverse()`, below.
     UserAccounts
         .findOne({username: req.user.username}, 'posts')
-        // .sort({publishedAt: -1})
         .populate('posts')
         .then(entries => {
-            entries = entries.posts;
+            entries = entries.posts.reverse();
             res.json(entries.map(entry => entry.apiRepr()));
         })
         .catch(err => res.status(500).json({error: 'something went wrong'}));
@@ -100,6 +101,7 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
                     user.posts.push(entry._id);
                     user.save();
                 });
+
             return entry;
         })
         .then(entry => res.status(201).json(entry.apiRepr()))

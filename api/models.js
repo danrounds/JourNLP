@@ -84,7 +84,7 @@ userAccountSchema.methods.apiRepr = function() {
     return {
         id: this._id,
         username: this.username,
-        posts: this.posts
+        posts: this.posts.reverse()
     };
 };
 

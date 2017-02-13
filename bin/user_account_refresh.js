@@ -144,5 +144,6 @@ connectMongo() // need to actually create a server instance,
     .then(dropDemoAccount) // so we can interact with the database
     .then(createDemoAccount)
     .then(createPosts)
-    .then(disconnectMongo);
+    .then(disconnectMongo)
+    .catch(err => console.log(err));
 
