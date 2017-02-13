@@ -41,9 +41,7 @@ const base = {
 };
 function createDemoAccount() {
     const req = {
-        // url: `http://localhost:${PORT}/api/user_account`,
-        url: `http://localhost:14866/api/user_account`,
-        // url: `http://localhost/api/user_account`,
+        url: `http://localhost:${PORT}/api/user_account`,
         body: JSON.stringify({
             username: username,
             password: password
@@ -55,9 +53,7 @@ function createDemoAccount() {
 function postPost(post) {
     // this will, um...POST a post
     const req = {
-        // url: `http://localhost:${PORT}/api/entries`,
-        url: `http://localhost:14866/api/entries`,
-        // url: `http://localhost/api/entries`,
+        url: `http://localhost:${PORT}/api/entries`,
         auth: {
             user: username,
             password: password
@@ -73,17 +69,20 @@ function createPosts() {
         postPost(post);
 }
 
-console.log(`DATABASE_URL: ${DATABASE_URL}`);
-
+function reInitDemoAccount() {
 connectMongo() // need to actually create a server instance,
     .then(dropDemoAccount) // so we can interact with the database
     .then(createDemoAccount)
     .then(createPosts)
     .then(disconnectMongo)
     .catch(err => console.log(err));
+}
 
+module.exports = {reInitDemoAccount};
 
-
+if (require.main === module) {
+    reInitDemoAccount();
+}
 
 
 
