@@ -161,7 +161,7 @@ function updateEntriesSidebar() {
             `<div class="sidebar-entry"><a href="view-entry.html?${ent.id}">`
                 +`<h4 class="sidebar-title">${ent.title}</h4>`
                 +`<p class="line-limit sidebar-body">${ent.body}</p>`
-                +`<p class="line-limit sidebar-topics">${ent.nlpTopics}</p>`
+                +`<p class="line-limit sidebar-topics">${ent.nlpTopics.join(', ')}</p>`
                 +`<p>${ent.publishedAt}</p>`
                 +`</a></div>`);
     });
@@ -170,12 +170,11 @@ function updateEntriesSidebar() {
 function updateTagsSidebar() {
     // write-entry.html AND view-entry.html
     // updates the right pane on desktop--our local document's tags
-    if (state.current) {
-        var tags = state.current.nlpTopics;
+    if (findById(getQueryString())) {
+        var tags = state.current.nlpTopics.join(', ');
         $('.tags-title').text(`Tags for post "${state.current.title}":`);
-
     } else
-        tags = 'Tags will appear once you\'ve <a href="write-entry.html">entered something.</a>';
+        tags = 'Tags will appear once you\'ve entered something.';
     $('.tags-text').html(tags);
 
 }
@@ -264,7 +263,7 @@ function updateListingsView() {
             containerOpenTag
                 +`<h4>${ent.title}</h4>`
                 +`<p class="line-limit listing-body">${ent.body}</p>`
-                +`<p listing-topics><em>topics: </em>${ent.nlpTopics}</p>`
+                +`<p listing-topics><em>topics: ${ent.nlpTopics.join(', ')}</em></p>`
                 +`<p class="secondary">published: ${ent.publishedAt}</p>`
             // buttons
                 + `<button class="btn btn-primary" id="${'view_'+id}">view</button>`
@@ -404,7 +403,7 @@ function logoutBind() {
     // Here, we make a bad Basic Authentication request, and the resulting 401
     // error status should convince our browser to flush existing credentials
     $('a#logout-link')
-        .text(`${state.author}, logout`)
+        .html(`${state.author},<br>logout`)
         .click(function(e) {
         window.open(`index.html`, '_self');
         authenticatedReq('A(W#JG(WJGAW(#JGW(#JGWJ#))))',

@@ -6,13 +6,13 @@ body {
     background-color: white;
 }
 
-.row-eq-height {
-    /* from: http://getbootstrap.com.vn/examples/equal-height-columns/ */
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display:         flex;
-}
+/* .row-eq-height { */
+/*     /\* from: http://getbootstrap.com.vn/examples/equal-height-columns/ *\/ */
+/*     display: -webkit-box; */
+/*     display: -webkit-flex; */
+/*     display: -ms-flexbox; */
+/*     display:         flex; */
+/* } */
 
 h1, h2, h3, h4, h5, h6, label {
     font-family: 'Barrio';
@@ -40,7 +40,7 @@ p, div {
 
 a {
     color: #ff5733;
-    /* text-shadow: 1px 0 white, -1px 0 white, 0 1px white, 0 -1px white; */
+    /* text-shadow: 0.5px 0 black, -0.5px 0 black, 0 0.5px black, 0 -0.5px black; */
 }
 
 a:hover {
@@ -48,13 +48,26 @@ a:hover {
     text-decoration: none;
 }
 
+a:active {
+    color: #581845;
+    text-decoration: none;
+}
+
 .secondary {
     color: gray;
+}
+
+a#logout-link {
+    font-size: 18px;
 }
 
 .sidebar, .even-entry {
     background-image: url('patterns/ignasi_pattern_s.png'); /* via http://www.subtlepatterns.com */
 }
+
+/* .entry { */
+/*     padding-top: 40px; */
+/* } */
 
 .new-entry {
     font-size: 20px;
@@ -108,6 +121,11 @@ a:hover {
     background-image: url('patterns/sayagata-400px.png'); /* via http://www.subtlepatterns.com */
 }
 
+.tags-title {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
 /* textarea { */
 /*     background-image: url('patterns/linedpaper.png'); */
 /* } */
@@ -136,10 +154,10 @@ a:hover {
 @media screen and (min-width: 1001px) {
     .tags-bar {
         /* min-height: 100%; */
-        /* height: 100%; */
-        display: inline-block;
-        vertical-align: middle;
-        float: none;
+        height: 1000px;
+        /* display: inline-block; */
+        /* vertical-align: middle; */
+        /* float: none; */
         padding-top: 150px;
     }
 }

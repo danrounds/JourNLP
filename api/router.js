@@ -83,29 +83,32 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
         return res.status(400).json(fieldMissing);
     }
 
-    nlpCategorize(req.body.title + ' ' + req.body.body)
-        .then(nlpTopics =>
-              Entries
-              .create({
-                  title: req.body.title,
-                  body: req.body.body,
-                  author: req.user.username,
-                  nlpTopics: nlpTopics
-              })
-             )
-        .then(entry => {
-            UserAccounts
-                .findOne({username: req.user.username})
-                .exec()
-                .then(user => {
-                    user.posts.push(entry._id);
-                    user.save();
-                });
-
-            return entry;
-        })
-        .then(entry => res.status(201).json(entry.apiRepr()))
-        .catch(err => res.status(500).json({error: 'Something went wrong'}));
+    const title = req.body.title.trim();
+    const body = req.body.body.trim();
+    // nlpCategorize(req.body.title.trim() + ' ' + req.body.body.trim())
+    nlpCategorize(title + ' ' + body)
+        .then(nlpTopics => {
+            Entries
+                .create({
+                    title: title,
+                    body: body,
+                    author: req.user.username,
+                    nlpTopics: nlpTopics
+                })
+                .then(entry => {
+                    UserAccounts
+                        .findOne({username: req.user.username})
+                        .exec()
+                        .then(user => {
+                            user.posts.push(entry._id);
+                            user.save();
+                        });
+                    
+                    return entry;
+                })
+                .then(entry => res.status(201).json(entry.apiRepr()))
+                .catch(err => res.status(500).json({error: 'Something went wrong'}));
+        });
 });
 
 router.put('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
@@ -117,7 +120,7 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
     const updateableFields = ['title', 'body'];
     updateableFields.forEach(field => {
         if (field in req.body) {
-            updated[field] = req.body[field];
+            updated[field] = req.body[field].trim();
         }
     });
 
@@ -167,11 +170,11 @@ router.post('/user_account/', (req, res) => {
     if (fieldMissing) {
         return res.status(400).json({error: fieldMissing});
     }
-    return UserAccounts.hashPassword(req.body.password)
+    return UserAccounts.hashPassword(req.body.password.trim())
         .then(hash => {
             UserAccounts
                 .create({
-                    username: req.body.username,
+                    username: req.body.username.trim(),
                     password: hash
                 })
                 .then(user => res.status(201).json(user.apiRepr()))
@@ -191,15 +194,19 @@ router.put('/user_account/', passport.authenticate('basic', {session: false}), (
     if (fieldMissing) {
         return res.status(400).json({error: fieldMissing});
     }
-    UserAccounts
-        .update(
-            {username: req.user.username},
-            {$set: {'password': req.body.newPassword}},
-            {runValidators: true}
-        )
-        // .then((updated) => res.status(204).json(updated.apiRepr()))
-        .then((updated) => res.status(204))
-        .catch(err => res.status(500).json({message: 'Server error'}));
+    return UserAccounts.hashPassword(req.body.newPassword.trim())
+        .then(hash => {
+            UserAccounts
+                .update(
+                    {username: req.user.username.trim()},
+                    // {$set: {'password': req.body.newPassword.trim()}},
+                    {$set: {'password': hash}},
+                    {runValidators: true}
+                )
+            // .then((updated) => res.status(204).json(updated.apiRepr()))
+                .then(updated => res.status(204).send())
+                .catch(err => res.status(500).json({message: 'Server error'}));
+        });
 });
 
 router.delete('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
