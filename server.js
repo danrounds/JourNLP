@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 
 const cron = require('node-cron');
-const {resetDemoAccount} = require ('./bin/user_account_refresh');
+const {resetDemoAccount} = require ('./bin/demo_account_refresh');
 
 const {DATABASE_URL, PORT} = require('./config');
 
@@ -70,6 +70,5 @@ if (require.main === module) {
 module.exports = {runServer, closeServer, app};
 
 cron.schedule('*/10 * * * *', () => {
-    console.log('czech it');
     resetDemoAccount();
 }, null, false);

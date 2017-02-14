@@ -1,3 +1,16 @@
+// This is a utility function that we run with node-cron, on a 10-minute
+// interval.
+//
+// It refreshes the database entries associated with our demo account
+//
+// The rationale here is that (conceivably), someone could vandalize our
+// demo account. Our cron job ensures that the demo account is refreshed,
+// periodically.
+//
+// A "better" (safer) strategy might be to generate unique demo accounts, based
+// on IP, and then have a nightly cron job to delete them. This is good enough,
+// for now, though.
+
 const {http} = require('http');
 const request = require('request-promise');
 
@@ -12,7 +25,7 @@ const password = 'abc123';
 function dropDemoAccount() {
     // Deletes our demo_account. We're skipping the endpoint, on the off chance
     // someone malicious has changed the password
-    console.log('Dropping `demo_account`');
+    console.log('[bin/demo_account_refresh] :: Dropping `demo_account`');
     const p1 = Entries
               .remove({author: username})
               .exec();
@@ -53,7 +66,8 @@ function postPost(post) {
 }
 
 function createPosts() {
-    console.log('Creating posts...');
+    // Issues a POST for every entry in our data, below
+    console.log('[bin/demo_account_refresh] :: Creating posts for `demo_account`...');
     for (let post of data)
         postPost(post);
 }
@@ -62,7 +76,8 @@ function resetDemoAccount() {
     dropDemoAccount()
         .then(createDemoAccount)
         .then(createPosts)
-        .catch(err => console.log(err));
+        .then(() => console.log('[bin/demo_account_refresh] :: `demo_account` refreshed!'))
+        .catch(err => console.log('[bin/demo_account_refresh] :: '+ err));
 }
 
 module.exports = {resetDemoAccount};
