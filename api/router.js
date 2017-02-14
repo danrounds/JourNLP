@@ -136,6 +136,7 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
             nlpCategorize(title + ' ' + req.body.body)
                 .then(nlpTopics => {
                     updated.nlpTopics = nlpTopics;
+                    updated.publishedAt = Date.now();
                     Entries
                         .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
                         .exec()

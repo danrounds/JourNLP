@@ -1,5 +1,6 @@
 body {
     background-image: url('patterns/sakura.gif'); /* via http://www.dinpattern.com/*/
+    background-attachment: fixed;
 }
 
 .container {
