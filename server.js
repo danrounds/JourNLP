@@ -69,7 +69,7 @@ if (require.main === module) {
 // to start & close, over and over.
 module.exports = {runServer, closeServer, app};
 
-cron.schedule('* * * * *', () => {
+cron.schedule('* * * *', () => {
     console.log('czech it');
     resetDemoAccount();
 }, null, false);
