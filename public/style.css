@@ -4,6 +4,7 @@ body {
 
 .container {
     background-color: white;
+    box-shadow: 1px 14px 18px 3px black;
 }
 
 /* .row-eq-height { */
@@ -41,6 +42,7 @@ p, div {
 a {
     color: #ff5733;
     /* text-shadow: 0.5px 0 black, -0.5px 0 black, 0 0.5px black, 0 -0.5px black; */
+    text-shadow: 0.5px 0 #ddd, -0.5px 0 #ddd, 0 0.5px #ddd, 0 -0.5px #ddd;
 }
 
 a:hover {
