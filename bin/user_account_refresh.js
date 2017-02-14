@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const {http} = require('http');
 const request = require('request-promise');
 
@@ -10,15 +8,6 @@ const mongoose = require('mongoose');
 
 const username = 'demo_account';
 const password = 'abc123';
-
-function connectMongo() {
-    return mongoose.connect(DATABASE_URL);
-}
-
-function disconnectMongo() {
-    console.log('Done! `demo_account` reset.');
-    return mongoose.disconnect();
-}
 
 function dropDemoAccount() {
     // Deletes our demo_account. We're skipping the endpoint, on the off chance
@@ -69,22 +58,14 @@ function createPosts() {
         postPost(post);
 }
 
-function reInitDemoAccount() {
-connectMongo() // need to actually create a server instance,
-    .then(dropDemoAccount) // so we can interact with the database
-    .then(createDemoAccount)
-    .then(createPosts)
-    .then(disconnectMongo)
-    .catch(err => console.log(err));
+function resetDemoAccount() {
+    dropDemoAccount()
+        .then(createDemoAccount)
+        .then(createPosts)
+        .catch(err => console.log(err));
 }
 
-module.exports = {reInitDemoAccount};
-
-if (require.main === module) {
-    reInitDemoAccount();
-}
-
-
+module.exports = {resetDemoAccount};
 
 
 //////////////////////////////////

@@ -3,12 +3,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 
-const {DATABASE_URL, PORT} = require('./config');
+const cron = require('node-cron');
+const {resetDemoAccount} = require ('./bin/user_account_refresh');
 
-const {router: apiRouter} = require('./api');
+const {DATABASE_URL, PORT} = require('./config');
 
 // ES6-style promises for mongoose
 mongoose.Promise = global.Promise;
+
+const {router: apiRouter} = require('./api');
 
 const app = express();
 app.use(morgan('common'));
@@ -65,3 +68,8 @@ if (require.main === module) {
 // tests) can start/close the server, at will. Our db-oriented test will need
 // to start & close, over and over.
 module.exports = {runServer, closeServer, app};
+
+cron.schedule('* * * * *', () => {
+    console.log('czech it');
+    resetDemoAccount();
+}, null, false);
