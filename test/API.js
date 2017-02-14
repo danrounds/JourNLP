@@ -80,6 +80,9 @@ function tearDownDb() {
 // our actual tests
 describe('Journal/notes entries API endpoints,', () => {
 
+    console.log('CAVEAT: Asyncrous factors will sometimes cause the tests to fail.'
+          +'If that happens, try re-running; they\'ll probably pass');
+
     // each of our hook functions returns a callback
     before(() => {
         runServer(TEST_DATABASE_URL);
