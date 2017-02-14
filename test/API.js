@@ -64,7 +64,7 @@ function generateEntry() {
             faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n' +
             faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph() + '\n\n',
+            faker.lorem.paragraph(),
         author: username,
         nlpTopics: ['abc', 'def', 'ghi', 'jkl', 'mno']
         // publishedAt: faker.date.past()
@@ -83,15 +83,13 @@ describe('Journal/notes entries API endpoints,', () => {
     // each of our hook functions returns a callback
     before(() => {
         runServer(TEST_DATABASE_URL);
-        postEntries();
     });
 
-    // beforeEach(postEntries());
+    beforeEach(() => postEntries());
 
-    // afterEach(tearDownDb);
+    afterEach(() => tearDownDb);
 
     after(() => {
-        tearDownDb();
         closeServer();
     });
 
@@ -115,7 +113,7 @@ describe('Journal/notes entries API endpoints,', () => {
                 .then((count) => { res.body.should.have.length.of(count); });
         });
 
-        it('should return entries (records) with the right fields and data', (done) => {
+        it('should return entries (records) with the right fields and data', () => {
             // strategy:
             //  1. GET journal entries, via server (& db-backing)
             //  2. make sure response is a JSON array (as per our API)
@@ -138,7 +136,7 @@ describe('Journal/notes entries API endpoints,', () => {
                     });
                     resEntry = res.body[0];
                     // \/ look up db entry that corresponds with response[0]
-                    return Entries.findById(resEntry.id);
+                    return Entries.findById(resEntry.id).exec();
                 })
                 .then(entryRecord => {
                     resEntry.id.should.equal(entryRecord.id);
@@ -257,27 +255,27 @@ describe('Journal/notes entries API endpoints,', () => {
             //  2. make DELETE request using this id
             //  3. check response's status code and wee whether a record
             //     with that id exists in our database
-            // let dbEntry;
-            // return Entries
-            //     .findOne()
-            //     .exec()
-            //     .then((_dbEntry) => {
-            //         dbEntry = _dbEntry;
-            //         // make request using our db entry's id
-            //         return chai.request(app)
-            //             .delete(`/api/entries/${dbEntry.id}`)
-            //             .auth(username, password);
-            //     })
-            //     .then((res) => {
-            //         res.should.have.status(204);
-            //         // post DELETE, we'll try to find the submitted entry in
-            //         // our database \/
-            //         return Entries.findById(dbEntry.id).exec();
-            //     })
-            //     .then((allegedlyDeleted) => {
-            //         // here's hoping that Entries.findById(...) doesn't exist
-            //         should.not.exist(allegedlyDeleted);
-            //     });
+            let dbEntry;
+            return Entries
+                .findOne()
+                .exec()
+                .then((_dbEntry) => {
+                    dbEntry = _dbEntry;
+                    // make request using our db entry's id
+                    return chai.request(app)
+                        .delete(`/api/entries/${dbEntry.id}`)
+                        .auth(username, password);
+                })
+                .then((res) => {
+                    res.should.have.status(204);
+                    // post DELETE, we'll try to find the submitted entry in
+                    // our database \/
+                    return Entries.findById(dbEntry.id).exec();
+                })
+                .then((allegedlyDeleted) => {
+                    // here's hoping that Entries.findById(...) doesn't exist
+                    should.not.exist(allegedlyDeleted);
+                });
         });
     });        
 });
