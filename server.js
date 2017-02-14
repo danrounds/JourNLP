@@ -69,6 +69,8 @@ if (require.main === module) {
 // to start & close, over and over.
 module.exports = {runServer, closeServer, app};
 
+
+// scheduled refresh of our demo account, once every 10 minutes
 cron.schedule('*/10 * * * *', () => {
     resetDemoAccount();
 }, null, false);
