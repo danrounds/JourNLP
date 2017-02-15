@@ -338,21 +338,23 @@ function writeEditButtons() {
         e.preventDefault();
         var title = $('#title-text').val().trim();
         var body = $('#body-text').val().trim();
-        var inputs = findById(getQueryString()) || {};
+        var original = findById(getQueryString()) || {};
 
         if (title.length === 0) { alert('Your entry needs a title'); }
         else if (body.length === 0) { alert('Your entry needs an actual body'); }
-        else if (inputs.title === title && inputs.body === body)
+        else if (original.title === title && original.body === body)
             window.open(`view-entry.html?${getQueryString()}`, '_self');
         else {                  // we have an actual entry to submit
             var id = getQueryString();
-            if (id) {
+            if (getQueryString()) {
                 editEntry({id: id, title: title, body: body});
+                window.open(`view-entry.html?${id}`, '_self');
             } else {
-                id = '';
-                submitEntry({title: title, body: body});
+                submitEntry({title: title, body: body})
+                    .done(function(res) {
+                        window.open(`view-entry.html?${res.id}`, '_self');
+                    });
             }
-            window.open(`view-entry.html?${id}`, '_self');
         }
     }
 
