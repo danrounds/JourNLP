@@ -255,6 +255,12 @@ function updateListingsView() {
     $('.entries-list').html('');
     var nEntries = 0;
     entries.forEach(function(ent) {
+
+        var tagsArray = [];
+        ent.nlpTopics.forEach(function(tag) {
+            tagsArray.push(`<a href="listings.html?${encodeURIComponent(tag)}`
+                           +`">${tag}</a>`);
+        });
         var id = ent.id;
         if (!(nEntries % 2))
             var containerOpenTag = '<div class="entry-listing even-entry">';
@@ -264,7 +270,7 @@ function updateListingsView() {
             containerOpenTag
                 +`<h4>${ent.title}</h4>`
                 +`<p class="line-limit listing-body">${ent.body}</p>`
-                +`<p listing-topics><em>topics: ${ent.nlpTopics.join(', ')}</em></p>`
+                +`<p listing-topics><em>topics: ${tagsArray.join(', ')}</em></p>`
                 +`<p class="secondary">published: ${ent.publishedAt}</p>`
             // buttons
                 + `<button class="btn btn-primary" id="${'view_'+id}">view</button>`
