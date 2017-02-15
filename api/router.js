@@ -136,14 +136,14 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
             nlpCategorize(title + ' ' + req.body.body)
                 .then(nlpTopics => {
                     updated.nlpTopics = nlpTopics;
-                    updated.publishedAt = Date.now();
+                    updated.lastUpdateAt = Date.now();
                     Entries
                         .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
                         .exec()
-                        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
-                        .catch(err => res.status(500).json({message: 'Server Error'}));
+                        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()));
                 });
-        });
+        })
+        .catch(err => res.status(500).json({message: 'Server Error'}));
 });
 
 router.delete('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {

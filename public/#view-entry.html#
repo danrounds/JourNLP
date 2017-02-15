@@ -46,7 +46,7 @@
           <p class="entry">
             <!-- the actual text of the entry will be populated, here, by our script -->
           </p>
-          <p class="text-right" id="last-update-at">
+          <p class="text-right" id="last-update-at"></p>
         </div>
 
         <div class="tags-bar col-md-3">

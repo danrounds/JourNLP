@@ -28,6 +28,7 @@ In this document, we'll refer to a journal/notes entry as a `post`. Our most oft
 * `author`: The name of the user account that made the post
 * `nlpTopics`: An array of strings, representing the NLP tags that our back-end generates on post submission (i.e. the topics in the post)
 * `publishedAt`: A string representing the timestamp for when the post was submitted
+* `lastUpdateAt`: A string representing timestamp for the last update _or_ `null`, if inapplicable
 
 ---------------------------------------------------------------
 ## __`post`-oriented endpoints:__

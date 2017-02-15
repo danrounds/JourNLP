@@ -153,9 +153,6 @@ function getQueryString() {
 function updateEntriesSidebar() {
     // write-entry.html AND view-entry.html
     // updates the left pane on desktop--our listing of entries
-    // $('.sidebar').text('');
-    // $('.entries-container').html('<h3 class="sidebar-entry">Entries:</h3>');
-
     state.entries.forEach(function(ent) {
         $('.entries-container').append(
             `<div class="sidebar-entry"><a href="view-entry.html?${ent.id}">`
@@ -171,12 +168,16 @@ function updateTagsSidebar() {
     // write-entry.html AND view-entry.html
     // updates the right pane on desktop--our local document's tags
     if (findById(getQueryString())) {
-        var tags = state.current.nlpTopics.join(', ');
+        var tagsArray = [];
+        state.current.nlpTopics.forEach(function(tag) {
+            tagsArray.push(`<a href="listings.html?${encodeURIComponent(tag)}`
+                           +`">${tag}</a>`);
+        });
         $('.tags-title').text(`Tags for post "${state.current.title}":`);
+        var tags = tagsArray.join(', ');
     } else
         tags = 'Tags will appear once you\'ve entered something.';
     $('.tags-text').html(tags);
-
 }
 
 ////
@@ -282,6 +283,8 @@ function updateEntryView() {
     if (state.current) {
         $('.title').text(state.current.title);
         $('.entry').text(state.current.body);
+        if(state.current.lastUpdateAt)
+            $('p#last-update-at').text(`last update: ${state.current.lastUpdateAt}`);
         $('.entry-display').append(`<a href="write-entry.html?${state.current.id}">edit</a>`);
     }
 }
@@ -296,10 +299,13 @@ function writeEditDisplayMain() {
         $('h1').text('edit an entry');
         $('#title-text').val(current.title);
         $('#body-text').val(current.body);
+        if (current.lastUpdateAt)
+            $('p#last-update-at').text(`last update at ${current.lastUpdateAt}`);
     }
 }
 function writeEditButtons() {
     // write-entry.html, subordinate
+    // The logic for our two or three buttons, underneath our textarea
 
     $('button#discard').click(function(e) {
         e.preventDefault();
@@ -322,6 +328,7 @@ function writeEditButtons() {
         }
     });
 
+    ///////////////////
     $('button#save').click(submit);
     $(document).keydown(function(e) {
         if (e.ctrlKey && e.which === 13)
@@ -349,6 +356,7 @@ function writeEditButtons() {
         }
     }
 
+    ///////////////////
     $('button#delete').click(function(e) {
         e.preventDefault();
 

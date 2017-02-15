@@ -22,8 +22,11 @@ const notesEntrySchema = mongoose.Schema({
     publishedAt: {
         type: Date,
         default: Date.now
+    },
+    lastUpdateAt: {
+        type: Date,
+        default: null
     }
-    // , lastupdatedAt: {type: String}
 });
 
 
@@ -38,7 +41,8 @@ notesEntrySchema.methods.apiRepr = function() {
         author: this.author,
         nlpTopics: this.nlpTopics,
         // nlpTopics: this.cleanedUpNlpTopics
-        publishedAt: this.publishedAt
+        publishedAt: this.publishedAt,
+        lastUpdateAt: this.lastUpdateAt
     };
 };
 
