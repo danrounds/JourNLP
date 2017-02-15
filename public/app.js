@@ -285,7 +285,15 @@ function updateEntryView() {
         $('.entry').text(state.current.body);
         if(state.current.lastUpdateAt)
             $('p#last-update-at').text(`last update: ${state.current.lastUpdateAt}`);
-        $('.entry-display').append(`<a href="write-entry.html?${state.current.id}">edit</a>`);
+        // $('.entry-display').append(`<a class="text-right" href="write-entry.html?${state.current.id}">edit</a>`);
+        $('a#edit-link').attr('href', `write-entry.html?${state.current.id}`);
+        $('a#delete-link').click(function(e) {
+            e.preventDefault();
+            if (confirm(`Are you sure you want to delete ${state.current.title}?`)){
+                deleteEntry(state.current.id);
+                window.open('view-entry.html', '_self');
+            }
+        });
     }
 }
 
