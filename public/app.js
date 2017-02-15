@@ -477,7 +477,7 @@ function dispatch() {
     if ($('body#write-entry').length) { writeEntryUpdate(); };
     if ($('body#listings').length)    { listingsUpdate(); };
     if ($('body#sign-up').length)     { signUp(); };
-    if ($('index'.length))            { demoLogin(); }
+    if ($('body#index'.length))       { demoLogin(); }
 }
 
 $( dispatch );
