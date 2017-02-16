@@ -8,14 +8,6 @@ body {
     box-shadow: 1px 14px 18px 3px black;
 }
 
-/* .row-eq-height { */
-/*     /\* from: http://getbootstrap.com.vn/examples/equal-height-columns/ *\/ */
-/*     display: -webkit-box; */
-/*     display: -webkit-flex; */
-/*     display: -ms-flexbox; */
-/*     display:         flex; */
-/* } */
-
 h1, h2, h3, h4, h5, h6, label {
     font-family: 'Barrio';
 }
@@ -121,17 +113,18 @@ a#logout-link {
 }
 
 .tags-bar {
-    background-image: url('patterns/sayagata-400px.png'); /* via http://www.subtlepatterns.com */
+    background:
+    linear-gradient(
+            rgba(0, 40, 255, 0.10),
+            rgba(0, 190, 255, 0.15)
+        ),
+    url('patterns/sayagata-400px.png'); /* via http://www.subtlepatterns.com */
 }
 
 .tags-title {
     font-size: 18px;
     margin-bottom: 20px;
 }
-
-/* textarea { */
-/*     background-image: url('patterns/linedpaper.png'); */
-/* } */
 
 .btn-primary {
     margin-top: 10px;
@@ -149,6 +142,7 @@ a#logout-link {
         display: none;
     }
     .tags-bar {
+        height: 300px;
         width: 100%;
         padding: 30px;
     }
@@ -157,10 +151,17 @@ a#logout-link {
 @media screen and (min-width: 1001px) {
     .tags-bar {
         /* min-height: 100%; */
-        height: 1000px;
+        /* height: 1000px; */
         /* display: inline-block; */
         /* vertical-align: middle; */
         /* float: none; */
         padding-top: 150px;
+    }
+    .row-eq-height {
+        /* from: http://getbootstrap.com.vn/examples/equal-height-columns/ */
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display:         flex;
     }
 }
