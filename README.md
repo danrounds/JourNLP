@@ -42,15 +42,13 @@ The API endpoints for this project broadly do two things:
 
 ![write listings](doc/entry.png)
 
-
-
+---------------------------------------------------------------
 
 **Click the categories to view your entries with the same categories**
 
 ![categories](doc/listings.png)
 
-
-
+---------------------------------------------------------------
 
 **View a visual representation of the topics you've written about**
 
