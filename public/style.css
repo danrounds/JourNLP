@@ -80,14 +80,17 @@ a#logout-link {
 }
 .sidebar-body {
     -webkit-line-clamp: 3;
+    height: 88px;               /* fallback for non-webkit */
 }
 
 .sidebar-topics {
     -webkit-line-clamp: 2;
+    height: 48px;               /* fallback for non-webkit */
 }
 
 .listing-body {
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 4;
+    height: 96px;               /* fallback for non-webkit */
 }
 /*                 END: multiline ellipses          */
 
@@ -115,7 +118,7 @@ a#logout-link {
 .tags-bar {
     background:
     linear-gradient(
-            rgba(0, 40, 255, 0.10),
+            rgba(190, 40, 255, 0.10),
             rgba(0, 190, 255, 0.15)
         ),
     url('patterns/sayagata-400px.png'); /* via http://www.subtlepatterns.com */
