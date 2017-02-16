@@ -2,6 +2,7 @@
 
 _JourNLP_ is a journaling/note-taking web app that automatically categorizes your notes for you, using Natural Language Processing. Type in your notes, submit, and _JourNLP_ categorizes them with NLP. Identical topics are grouped together, and data from your notes can be visualized.
 
+#### [Production version, live...here.](https://jour-nlp.herokuapp.com)
 ---------------------------------------------------------------
 
 ## Platforms/libraries/frameworks used
@@ -12,6 +13,7 @@ _JourNLP_ is a journaling/note-taking web app that automatically categorizes you
 * [bcryptjs](https://www.npmjs.com/package/bcryptjs) for password hashing & salting
 * Mocha and Chai, for our tests
 * [Travis-CI](https://travis-ci.org/) for test automation
+* [node-cron](https://github.com/kelektiv/node-cron) for periodically refreshing our demo account's data
 * jQuery, for our client
 
 Sidebar patterns, courtesy [subtlepatterns.com](http://www.subtlepatterns.com) and [dinpattern.com](http://www.dinpattern.com/).
@@ -30,6 +32,20 @@ The API endpoints for this project broadly do two things:
 
 ### API Endpoints
 
-[API endpoints described here.](API-documentation.md)
+[API endpoints described here.](doc/API-documentation.md)
 
 ---------------------------------------------------------------
+
+## Screenshots
+
+Write listings; JourNLP categorizes them
+![write listings](doc/entry.png)
+
+
+Click the categories to view your entries with the same categories
+![categories](doc/listings.png)
+
+
+View a visual representation of the topics you've written about
+![visualization](doc/analysis.png)
+
