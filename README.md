@@ -44,7 +44,7 @@ The API endpoints for this project broadly do two things:
 
 ---------------------------------------------------------------
 
-**Click the categories to view your entries with the same categories**
+**Click the categories to view your entries with those same categories**
 
 ![categories](doc/listings.png)
 
@@ -53,4 +53,3 @@ The API endpoints for this project broadly do two things:
 **View a visual representation of the topics you've written about**
 
 ![visualization](doc/analysis.png)
-
