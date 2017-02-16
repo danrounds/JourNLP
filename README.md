@@ -38,14 +38,17 @@ The API endpoints for this project broadly do two things:
 
 ## Screenshots
 
-Write listings; JourNLP categorizes them
+**Write listings; JourNLP categorizes them**
+
 ![write listings](doc/entry.png)
 
 
-Click the categories to view your entries with the same categories
+**Click the categories to view your entries with the same categories**
+
 ![categories](doc/listings.png)
 
 
-View a visual representation of the topics you've written about
+**View a visual representation of the topics you've written about**
+
 ![visualization](doc/analysis.png)
 
