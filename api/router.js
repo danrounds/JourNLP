@@ -86,7 +86,7 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
     const title = req.body.title.trim();
     const body = req.body.body.trim();
     // nlpCategorize(req.body.title.trim() + ' ' + req.body.body.trim())
-    nlpCategorize(title + '\n' + body)
+    nlpCategorize(title + '. ' + body)
         .then(nlpTopics => {
             Entries
                 .create({
@@ -133,7 +133,7 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
             return req.body.title || entry.title;
         })
         .then((title) => {
-            nlpCategorize(title + '\n' + req.body.body)
+            nlpCategorize(title + '. ' + req.body.body)
                 .then(nlpTopics => {
                     updated.nlpTopics = nlpTopics;
                     updated.lastUpdateAt = Date.now();
