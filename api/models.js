@@ -3,8 +3,6 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 
-mongoose.Promise = global.Promise;
-
 const notesEntrySchema = mongoose.Schema({
     title:{
         type: String,

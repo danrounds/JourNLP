@@ -14,7 +14,7 @@ mongoose.Promise = global.Promise;
 const {router: apiRouter} = require('./api');
 
 const app = express();
-app.use(morgan('common'));
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 // getting down to some actual serving:
