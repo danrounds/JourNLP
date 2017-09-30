@@ -22,9 +22,8 @@ const [username, password] = ['test_account', 'password'];
 
 // populates our database with plausible-seeming journal-entry data
 // function postEntries() {
-function postEntries() {
+function postEntries(done) {
     console.info('Seeding notes/journal-entry db records');
-    let events = [];
 
     UserAccounts.hashPassword(password)
         .then(hash => {
@@ -36,7 +35,6 @@ function postEntries() {
         })
         .then(() => {
             for (let i = 0; i < 10; i++) {
-                // entries[i] = generateEntry();
                 Entries
                     .create(generateEntry())
                     .then(entry => {
@@ -45,12 +43,12 @@ function postEntries() {
                             .exec()
                             .then(user => {
                                 user.posts.push(entry._id);
-                                events.push([user.save()]);
+                                user.save();
                             });
                     });
             }
-        });
-    return Promise.all(events);
+        })
+        .then(() => done());
 }
 
 // Faker makes us some nice-looking fake journal entries
@@ -72,9 +70,9 @@ function generateEntry() {
     };
 }
 
-function tearDownDb() {
+function tearDownDb(cb) {
     console.warn('Clearing db records');
-    return mongoose.connection.dropDatabase();
+    return mongoose.connection.dropDatabase(cb);
 }
 
 // our actual tests
@@ -83,18 +81,16 @@ describe('Journal/notes entries API endpoints,', () => {
     console.log('CAVEAT: Asyncrous factors will sometimes cause the tests to fail.'
           +'If that happens, try re-running; they\'ll probably pass');
 
-    // each of our hook functions returns a callback
-    before(() => {
+    before((done) => {
         runServer(TEST_DATABASE_URL);
+        tearDownDb(done);
     });
 
-    beforeEach(() => postEntries());
+    beforeEach((done) => postEntries(done));
 
-    afterEach(() => tearDownDb);
+    afterEach(() => tearDownDb());
 
-    after(() => {
-        closeServer();
-    });
+    after(() => closeServer());
 
 
     describe('GET endpoint :: /api/entries/.*', () => {
