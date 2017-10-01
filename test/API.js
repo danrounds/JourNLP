@@ -70,9 +70,9 @@ function generateEntry() {
     };
 }
 
-function tearDownDb(cb) {
+function tearDownDb() {
     console.warn('Clearing db records');
-    return mongoose.connection.dropDatabase(cb);
+    return mongoose.connection.dropDatabase();
 }
 
 // our actual tests
@@ -81,9 +81,9 @@ describe('Journal/notes entries API endpoints,', () => {
     console.log('CAVEAT: Asyncrous factors will sometimes cause the tests to fail.'
           +'If that happens, try re-running; they\'ll probably pass');
 
-    before((done) => {
+    before(() => {
         runServer(TEST_DATABASE_URL);
-        tearDownDb(done);
+        return tearDownDb();
     });
 
     beforeEach((done) => postEntries(done));
