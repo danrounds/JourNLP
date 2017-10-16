@@ -34,7 +34,6 @@ p, div {
 
 a {
     color: #ff5733;
-    /* text-shadow: 0.5px 0 black, -0.5px 0 black, 0 0.5px black, 0 -0.5px black; */
     text-shadow: 0.5px 0 #ddd, -0.5px 0 #ddd, 0 0.5px #ddd, 0 -0.5px #ddd;
 }
 
@@ -140,6 +139,12 @@ a#logout-link {
 
 .btn-primary:hover {
     background-color: #581845;
+    border-color: #dd0011;
+}
+
+.btn:active, .btn:focus {
+    background-color: #dd0011 !important;
+    border-color: #900c3f !important;
 }
 
 /* Extra Small Devices, Phones */ 
