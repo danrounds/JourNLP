@@ -42,7 +42,7 @@ a:hover {
     text-decoration: none;
 }
 
-a:active {
+a:active, a:focus {
     color: #581845;
     text-decoration: none;
 }
