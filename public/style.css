@@ -59,10 +59,6 @@ a#logout-link {
     background-image: url('patterns/ignasi_pattern_s.png'); /* via http://www.subtlepatterns.com */
 }
 
-/* .entry { */
-/*     padding-top: 40px; */
-/* } */
-
 .new-entry {
     font-size: 20px;
 }
@@ -143,7 +139,7 @@ a#logout-link {
 }
 
 .btn:active, .btn:focus {
-    background-color: #dd0011 !important;
+    background-color: #ff55ff !important;
     border-color: #900c3f !important;
 }
 
