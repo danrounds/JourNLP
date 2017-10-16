@@ -108,10 +108,10 @@ _For deleting a post, `id` = `:id`_. Once it's gone, it's gone! No takebacks.
 #### Request
 * __URL:__ `:id` refers to post id
 
-####_Success:_
+#### _Success:_
 * __Status:__ `204 No Content`
 
-####_Failure:_
+#### _Failure:_
 * __Status:__ `500 Internal Server Error`
 
 ---------------------------------------------------------------
