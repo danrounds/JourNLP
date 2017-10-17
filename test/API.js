@@ -192,7 +192,6 @@ describe('Journal/notes entries API endpoints,', function() {
                     res.should.be.json;
                     res.body.should.include.keys('title', 'body', 'author');
                     res.body.title.should.equal(submittedEntry.title);
-                    // res.body.title.should.equal(submittedEntry.body.title);
                     res.body.body.should.equal(submittedEntry.body);
                     res.body.author.should.equal(submittedEntry.author);
                     // and now return the relevant database entry
