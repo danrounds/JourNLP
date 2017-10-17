@@ -7,11 +7,17 @@ const chaiHttp = require('chai-http');
 // lets us use THING.should.have/THING.should.be-style constructs
 const should = chai.should();
 
-const {app} = require('../server');
+const { TEST_DATABASE_URL } = require('../config');
+const { app, runServer, closeServer } = require('../server');
 
 chai.use(chaiHttp);
 
 describe('Pages', function() {
+
+    before(() => runServer(TEST_DATABASE_URL);
+
+    after(() => closeServer());
+
     describe('index.html', function() {
         let res;
         it('should return a 200 status code', function() {
