@@ -36,6 +36,7 @@ label {
 p, div {
     font-family: 'Manuale', serif;
     font-size: 16px;
+    color: #333;
 }
 
 a {
