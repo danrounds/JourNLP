@@ -77,14 +77,15 @@ function tearDownDb() {
 }
 
 // our actual tests
-describe('Journal/notes entries API endpoints,', () => {
-
+describe('Journal/notes entries API endpoints,', function() {
     console.log('CAVEAT: Asyncrous factors will sometimes cause the tests to fail.'
           +'If that happens, try re-running; they\'ll probably pass');
 
+    this.timeout(5000);
+
     before(() => {
         runServer(TEST_DATABASE_URL);
-        return tearDownDb();
+        tearDownDb();
     });
 
     beforeEach(() => postEntries());
