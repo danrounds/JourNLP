@@ -46,32 +46,34 @@ function checkFields(body, fields) {
 
 // ENDPOINTS:
 // /entries/.* endpoints
-router.get('/entries/', passport.authenticate('basic', {session: false}), (req, res) =>
+router.get('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
     // this returns an array of the authenticated user's notes entries
     // The simplest way to add entries (see, POST) is to just push onto the end
     // of an array of post ids; the result is sorted with oldest posts, first.
     // This isn't quite what we want, hence `entries.posts.reverse()`, below.
-    UserAccounts
+    return UserAccounts
         .findOne({username: req.user.username}, 'posts')
         .populate('posts')
         .then(entries => {
             entries = entries.posts.reverse();
             res.json(entries.map(entry => entry.apiRepr()));
         })
-        .catch(err => res.status(500).json({error: 'something went wrong'})));
+        .catch(err => res.sendStatus(500));
+});
 
-router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => 
+router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
     // this returns the entry with the specific id, assuming it belongs to the authenticated user
-    Entries
+    return Entries
         .findById(req.params.id)
         .exec()
         .then(entry => {
             if (req.user.username === entry.author)
                 res.json(entry.apiRepr());
             else
-                res.status(403).send();
+                res.sendStatus(403);
         })
-        .catch(err => res.status(500).json({error: 'Something went wrong'})));
+        .catch(err => res.sendStatus(500));
+});
 
 router.post('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
     // submits/saves an entry, associated with the given user account
@@ -89,20 +91,20 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
                   title,
                   body,
                   nlpTopics,
-                })
-                .then(entry => {
-                    UserAccounts
-                        .findOne({username: req.user.username})
-                        .exec()
-                        .then(user => {
-                            user.posts.push(entry._id);
-                            user.save();
-                        });
+              })
+              .then(entry => {
+                  UserAccounts
+                      .findOne({username: req.user.username})
+                      .exec()
+                      .then(user => {
+                          user.posts.push(entry._id);
+                          user.save();
+                      });
 
-                    return entry;
-                })
-                .then(entry => res.status(201).json(entry.apiRepr()))
-                .catch(err => res.status(500).json({error: 'Something went wrong'})));
+                  return entry;
+              })
+              .then(entry => res.status(201).json(entry.apiRepr()))
+              .catch(() => res.sendStatus(500)));
 });
 
 router.put('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
@@ -122,7 +124,7 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
     // make sure the author is the one editing the entry
         .then(entry => {
             if (req.user.username !== entry.author)
-                res.status(403).send(); // 403: Forbidden
+                res.sendStatus(403); // 403: Forbidden
             return req.body.title || entry.title;
         })
         .then((title) => {
@@ -136,25 +138,27 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
                         .then(updatedPost => res.status(201).json(updatedPost.apiRepr()));
                 });
         })
-        .catch(err => res.status(500).json({message: 'Server Error'}));
+        .catch(err => res.sendStatus(500));
 });
 
-router.delete('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) =>
+router.delete('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
     // deletes the entry with the given id
-    Entries
+    return Entries
         .findByIdAndRemove(req.params.id)
         .exec()
         .then(() => res.status(204).json({message: 'success'}))
-        .catch(err => res.status(500).json({error: 'Something went wrong'})));
+        .catch(err => res.status(500).json({error: 'Something went wrong'}));
+});
 
 // /user_account/ endpoints
-router.get('/user_account/', passport.authenticate('basic', {session: false}), (req, res) =>
+router.get('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
     // returns the user-relevant data associated with the authenticated user
-    UserAccounts
+    return UserAccounts
         .findOne({username: req.user.username})
         .populate('posts')
         .then(userData => res.json(userData.apiRepr()))
-        .catch(err => res.status(500).json({error: 'Something went wrong'})));
+        .catch(err => res.status(500).json({error: 'Something went wrong'}));
+});
 
 router.post('/user_account/', (req, res) => {
     // creates a user account, with username: username, and password: password
@@ -195,8 +199,8 @@ router.put('/user_account/', passport.authenticate('basic', {session: false}), (
                     {$set: {'password': hash}},
                     {runValidators: true}
                 )
-                .then(updated => res.status(204).send())
-                .catch(err => res.status(500).json({message: 'Server error'}));
+                .then(updated => res.sendStatus(204))
+                .catch(err => res.sendStatus(500));
         });
 });
 
@@ -210,9 +214,8 @@ router.delete('/user_account/', passport.authenticate('basic', {session: false})
               .exec();
 
     return Promise.all([p1, p2])
-        .then(() => res.status(204).send()) // Success!
-        .catch(err => res.status(500).json({error: 'Server error'}));
+        .then(() => res.sendStatus(204)) // Success!
+        .catch(err => res.sendStatus(500));
 });
-
 
 module.exports = {router};
