@@ -6,16 +6,15 @@ const chaiHttp = require('chai-http');
 const faker = require('faker');
 const mongoose = require('mongoose');
 
-// lets us use THING.should.have/THING.should.be-style constructs
-const should = chai.should();
-
 const {nlpCategorize, Entry, UserAccount} = require('../api'); 
 const Entries = Entry;               // mongoose likes singular nouns
 const UserAccounts = UserAccount;    // ...but I don't
 
-const {app, runServer, closeServer} = require('../server');
-const {TEST_DATABASE_URL} = require('../config');
+const { app, runServer, closeServer } = require('../server');
+const { TEST_DATABASE_URL } = require('../config');
 
+// lets us use THING.should.have/THING.should.be-style constructs
+const should = chai.should();
 chai.use(chaiHttp);
 
 const [username, password] = ['test_account', 'password'];
@@ -56,18 +55,16 @@ function postEntries() {
 function generateEntry() {
     return  {
         title: faker.random.words(4),
-        body: faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph() + '\n\n' +
-            faker.lorem.paragraph(),
+        body: faker.lorem.paragraph() + '\n\n'
+            + faker.lorem.paragraph() + '\n\n'
+            + faker.lorem.paragraph() + '\n\n'
+            + faker.lorem.paragraph() + '\n\n'
+            + faker.lorem.paragraph() + '\n\n'
+            + faker.lorem.paragraph() + '\n\n'
+            + faker.lorem.paragraph() + '\n\n'
+            + faker.lorem.paragraph(),
         author: username,
-        nlpTopics: ['abc', 'def', 'ghi', 'jkl', 'mno']
-        // publishedAt: faker.date.past()
-        // lastupdatedAt: faker.date.future()
+        nlpTopics: ['abc', 'def', 'ghi', 'jkl', 'mno'],
     };
 }
 
@@ -78,8 +75,6 @@ function tearDownDb() {
 
 // our actual tests
 describe('Journal/notes entries API endpoints,', function() {
-    console.log('CAVEAT: Asyncrous factors will sometimes cause the tests to fail.'
-          +'If that happens, try re-running; they\'ll probably pass');
 
     this.timeout(5000);
 
