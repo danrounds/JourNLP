@@ -4,12 +4,11 @@ const {BasicStrategy} = require('passport-http');
 const passport = require('passport');
 
 const {UserAccount, Entry} = require('./models');
-const Entries = Entry;          // I hate mongoose's naming conventions
-const UserAccounts = UserAccount;
-
 const {nlpCategorize} = require('./nlp');
 
 const router = express.Router();
+const Entries = Entry;          // I hate mongoose's naming conventions
+const UserAccounts = UserAccount;
 
 router.use(jsonParser);
 
