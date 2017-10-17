@@ -427,7 +427,7 @@ function logoutBind() {
     // Here, we make a bad Basic Authentication request, and the resulting 401
     // error status should convince our browser to flush existing credentials
     $('a#logout-link')
-        .html(`${state.author},<br>logout`)
+        .html(`${state.author}<br><em id=logout>logout</em>`)
         .click(function(e) {
         window.open(`index.html`, '_self');
         authenticatedReq('A(W#JG(WJGAW(#JGW(#JGWJ#))))',

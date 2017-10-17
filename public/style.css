@@ -22,13 +22,19 @@ h3 {
     color: gray;
 }
 
+h4 {
+    font-size: 20px;
+    font-family: 'Manuale', serif;
+    font-weight: bold;
+}
+
 label {
     font-size: 20px;
     color: gray;
 }
 
 p, div {
-    font-family: 'Pangolin';
+    font-family: 'Manuale', serif;
     font-size: 16px;
 }
 
@@ -50,9 +56,27 @@ a:active, a:focus {
 .secondary {
     color: gray;
 }
-
 a#logout-link {
     font-size: 18px;
+    font-weight: bold;
+}
+
+em#logout {
+    font-style: normal;
+    font-weight: normal;
+}
+
+.text-right {
+    margin-left: -30px;
+}
+
+#edit-link {
+    display: inline-block;
+    margin-left: 6px;
+}
+
+.text-right {
+    font-weight: bold;
 }
 
 .sidebar, .even-entry {
@@ -61,6 +85,7 @@ a#logout-link {
 
 .new-entry {
     font-size: 20px;
+    font-weight: bold;
 }
 
 /* multiline text ellipses, courtesy the example at: */

@@ -41,7 +41,9 @@ h1 {
 }
 
 h2 {
+    font-family: 'Manuale', serif;
     font-size: 40px;
+    font-weight: bold;
 }
 
 p {
