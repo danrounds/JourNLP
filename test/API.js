@@ -22,10 +22,11 @@ const [username, password] = ['test_account', 'password'];
 
 // populates our database with plausible-seeming journal-entry data
 // function postEntries() {
-function postEntries(done) {
+function postEntries() {
     console.info('Seeding notes/journal-entry db records');
 
-    UserAccounts.hashPassword(password)
+    const dbQueries = [];
+    return UserAccounts.hashPassword(password)
         .then(hash => {
             UserAccounts
                 .create({
@@ -35,7 +36,7 @@ function postEntries(done) {
         })
         .then(() => {
             for (let i = 0; i < 10; i++) {
-                Entries
+                dbQueries.push(Entries
                     .create(generateEntry())
                     .then(entry => {
                         UserAccounts
@@ -45,10 +46,10 @@ function postEntries(done) {
                                 user.posts.push(entry._id);
                                 user.save();
                             });
-                    });
+                    }));
             }
         })
-        .then(() => done());
+        .then(() => Promise.all(dbQueries));
 }
 
 // Faker makes us some nice-looking fake journal entries
@@ -86,7 +87,7 @@ describe('Journal/notes entries API endpoints,', () => {
         return tearDownDb();
     });
 
-    beforeEach((done) => postEntries(done));
+    beforeEach(() => postEntries());
 
     afterEach(() => tearDownDb());
 
