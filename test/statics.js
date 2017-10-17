@@ -1,20 +1,16 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-// const faker = require('faker'); --    we'll install and use this later for
-//                                       database testing
-// const mongoose = require('mongoose'); see above
-
-// lets us use THING.should.have/THING.should.be-style constructs
-const should = chai.should();
 
 const { TEST_DATABASE_URL } = require('../config');
 const { app, runServer, closeServer } = require('../server');
 
+// lets us use THING.should.have/THING.should.be-style constructs
+const should = chai.should();
 chai.use(chaiHttp);
 
 describe('Pages', function() {
 
-    before(() => runServer(TEST_DATABASE_URL);
+    before(() => runServer(TEST_DATABASE_URL));
 
     after(() => closeServer());
 
