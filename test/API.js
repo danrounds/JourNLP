@@ -78,8 +78,7 @@ describe('Journal/notes entries API endpoints,', function() {
 
     this.timeout(5000);
 
-    before(() => runServer(TEST_DATABASE_URL)
-           .then(() => tearDownDb()));
+    before(() => Promise.all([runServer(TEST_DATABASE_URL), tearDownDb()]));
 
     beforeEach(() => postEntries());
 
