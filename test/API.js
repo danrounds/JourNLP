@@ -6,7 +6,7 @@ const chaiHttp = require('chai-http');
 const faker = require('faker');
 const mongoose = require('mongoose');
 
-const {nlpCategorize, Entry, UserAccount} = require('../api'); 
+const {nlpCategorize, Entry, UserAccount} = require('../api');
 const Entries = Entry;               // mongoose likes singular nouns
 const UserAccounts = UserAccount;    // ...but I don't
 
