@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
-  <meta name="viewport" content="width=device-width, initial-scale=0.75 user-scalable=no">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=0.75 user-scalable=no">
     <title>Sign up for JourNLP!</title>
     <!-- <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"> -->
     <!-- <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'> -->
@@ -9,18 +9,17 @@
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" /> -->
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" media="screen"/>
-    <link href="https://fonts.googleapis.com/css?family=Pangolin|Barrio|Manuale" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Manuale|Merriweather|Quicksand" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="splash-sign-up.css" type="text/css" media="screen"/>
-
+    <style>html,body{height:100%;}.container{height:100%;}</style>
   </head>
 
   <body id="sign-up">
-    <div class="container" style="height:600px;">
+    <div class="container">
       <div class="row">
-
         <div class="masthead">
-          <ul class="nav nav-pills pull-right">
+          <ul class="nav nav-pills pull-right our-nav">
             <li class="headlinks"><a href="index.html">About</a></li>
             <li class="current headlinks"><a href="write-entry.html">Login</a></li>
             <li class="headlinks"><a href="#">Contact</a></li>
@@ -31,11 +30,10 @@
       </div>
 
       <div class="row">
-        <div class="text-center" style="padding:50px 0">
+        <div class="text-center" style="padding:11px 0">
 	        <h2>sign up</h2>
         </div>
       </div>
-      
 
 	    <div class="login-form-1">
 		    <form id="login-form" enctype="application/json">
@@ -53,7 +51,7 @@
             </div>
           </div>
 
-          <div class="row row-centered">
+          <div style="margin-top:5px;"class="row row-centered">
             <div class="col-md-4 col-centered">
 					    <label for="password" class="sr-only">Password</label>
 					    <input type="password" class="form-control" id="password" name="password" placeholder="password" required>
@@ -62,11 +60,17 @@
 
           <div class="row row-centered">
             <div class="col-md-4 col-centered">
-              <a id="signup-submit" class="btn btn-large btn-primary pull-right" href="#">sign-up!</a>
+              <a id="signup-submit" class="btn btn-large btn-primary pull-right" href="#">do it!</a>
             </div>
           </div>
-
 		    </form>
+
+        <footer class="footer-fixed">
+          <div class="col-md-12">
+            <p><a href="https://danrounds.github.io/portfolio/"
+                  target="_blank" rel="noopener noreferrer" class="portfolio-link">Dan Rounds, 2017</a></p>
+          </div>
+        </footer>
 	    </div>
     </div>
 

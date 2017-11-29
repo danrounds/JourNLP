@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <meta name="viewport" content="width=device-width, initial-scale=0.75 user-scalable=no">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=0.75 user-scalable=no">
 	  <title>Analysis</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" media="screen"/>
-
-    <link href="https://fonts.googleapis.com/css?family=Pangolin|Barrio|Manuale" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Manuale|Merriweather|Quicksand" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css" type="text/css" media="screen"/>
     <style>
-      .switched, li:active{ background:gold; border-radius: 4px;}
+      .switched, li:active {background:gold; border-radius: 4px;}
     </style>
   </head>
   <body id="analysis">
 
     <div class="container">
+      <p class="text-right"><a href="#" class="logout-link visible-in-mobile-only">logout</a></p>
       <div class="row">
         <div class="entries-list">
           <div class="col-md-4">
-            <a href="write-entry.html" class="new-entry">New entry</a><br>
+            <div class="col-md-12">
+              <h2 class="project-name">JourNLP</h2>
+              <a href="write-entry.html" class="new-entry">New entry</a><br>
+            </div>
           </div>
-          <div class="col-md-6 pull-right">
-            <p class="text-right"><a href="#" class="logout-link" id="logout-link">logout</a></p>
+          <div class="col-md-5">
+            <p class="text-right"><a href="#" class="logout-link invisible-in-mobile">logout</a></p>
           </div>
         </div>
       </div>
@@ -30,7 +33,6 @@
           <ul class="nav nav-pills pull-right">
             <li id="map" class="headlinks switched"><a href="#">map</a></li>
             <li id="tree" class="current headlinks"><a href="#">tree</a></li>
-            <!-- <li id="other" class="headlinks"><a href="#">other</a></li> -->
           </ul>
         </div>
       </div>
@@ -50,7 +52,9 @@
           <div class="tags-text">
             <!-- tags: GLOBALLY, "scraped", tags, go, here, via, NLP, analysis, of, all, our, documents -->
           </div>
-          <h3 class="text-center"><a class="listings-link" href="listings.html">view all entries</a></h3>
+          <div class="views-div text-center">
+            <h3 class="views-a"><a class="listings-link" href="listings.html">view all entries</a></h3>
+          </div>
         </div>
       </div>
 
@@ -58,6 +62,6 @@
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="app.js"></script>
-    <script src="visualization.js"></script>
+    <script src="analysis.js"></script>
   </body>
 </html>

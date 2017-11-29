@@ -1,35 +1,28 @@
 <!DOCTYPE html>
 <html>
-  <meta name="viewport" content="width=device-width, initial-scale=0.75 user-scalable=no">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=0.75 user-scalable=no">
 	  <title>View Entries</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" media="screen"/>
-
-    <link href="https://fonts.googleapis.com/css?family=Pangolin|Barrio|Manuale" rel="stylesheet" type="text/css">
-
+    <link href="https://fonts.googleapis.com/css?family=Manuale|Merriweather|Quicksand" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css" type="text/css" media="screen"/>
-
   </head>
   <body id="listings">
-
-    <div class="container">
-
-
-      <div class="row-fluid row-eq-height">
-        <div class="col-md-2">
+    <div class="container" style="min-height:100%;">
+      <p class="text-right"><a href="#" class="logout-link visible-in-mobile-only">logout</a></p>
+      <div class="row-fluid row-eq-height" style="min-height:100%">
+        <div class="col-md-2" style="margin-bottom:15px;">
+          <h2 class="project-name">JourNLP</h2>
           <a class="new-entry" href="write-entry.html">New entry</a>
         </div>
 
-        <div class="col-md-4">
-          <h1>
-            <!-- Entries, All -->
-          </h1>
+        <div class="col-md-5">
+          <h1><!-- Entries, all --></h1>
         </div>
 
-        <div class="col-md-3">
-          <p class="text-right"><a href="#" class="logout-link" id="logout-link">logout</a></p>
+        <div class="col-md-2">
+          <p class="text-right invisible-in-mobile"><a href="#" class="logout-link">logout</a></p>
         </div>
-
       </div>
 
       <div class="row row-eq-height">
@@ -46,16 +39,17 @@
          
         </div>
 
-        <div class="tags-bar col-md-3">
+        <div class="tags-bar col-md-3" style="min-height:100%">
           <div class="tags-title">
             <!-- Tags for: -->
           </div>
           <div class="tags-text">
             <!-- tags: GLOBALLY, "scraped", tags, go, here, via, NLP, analysis, of, all, our, documents -->
           </div>
-          <h3 class="text-center"><a class="listings-link" href="listings.html">view all entries</a></h3>
-          <h3 class="text-center"><a href="analysis.html">view analysis</a></h3>
-
+          <div class="views-div text-center">
+            <h3 class="views-a"><a class="listings-link" href="listings.html">view all entries</a></h3>
+            <h3 class="views-a"><a href="analysis.html">view analysis</a></h3>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,9 @@
+html, body {
+    height: 100%;
+}
+
 body {
-    background-image: url('patterns/sakura.gif'); /* via http://www.dinpattern.com/*/
+    background-image: url('images/wild-sea.png'); /* via http://www.dinpattern.com/*/
     background-attachment: fixed;
 }
 
@@ -8,8 +12,12 @@ body {
     box-shadow: 1px 14px 18px 3px black;
 }
 
+:hover {
+    transition: all 0.2s linear;
+}
+
 h1, h2, h3, h4, h5, h6, label {
-    font-family: 'Barrio';
+    font-family: 'Quicksand', sans-serif;
 }
 
 h1 {
@@ -23,14 +31,18 @@ h3 {
 }
 
 h4 {
+    font-family: 'Quicksand', san-serif;
     font-size: 20px;
-    font-family: 'Manuale', serif;
     font-weight: bold;
 }
 
 label {
-    font-size: 20px;
     color: gray;
+    font-size: 20px;
+}
+
+.header-div {
+    margin-bottom: 20px;
 }
 
 p, div {
@@ -39,8 +51,13 @@ p, div {
     color: #333;
 }
 
+a, button {
+    font-family: 'Quicksand', san-serif;
+}
+
 a {
     color: #ff5733;
+    font-family: 'Quicksand', san-serif;
     text-shadow: 0.5px 0 #ddd, -0.5px 0 #ddd, 0 0.5px #ddd, 0 -0.5px #ddd;
 }
 
@@ -54,10 +71,30 @@ a:active, a:focus {
     text-decoration: none;
 }
 
+input:focus,
+textarea:focus {
+    border-color: rgba(144, 12, 63, 0.3) !important;
+    box-shadow: inset 0 1px 1px rgba(50, 50, 50, 0.075), 0 0 8px rgba(255, 0, 0, 0.6) !important;
+}
+
 .secondary {
     color: gray;
 }
-a#logout-link {
+
+.project-name {
+    color: #777;
+    font-family: 'Manuale', serif;
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.portfolio-link {
+    color: #333;
+    font-family: 'Manuale', serif;
+    font-weight: bold;
+}
+
+a.logout-link {
     font-size: 18px;
     font-weight: bold;
 }
@@ -68,12 +105,12 @@ em#logout {
 }
 
 .text-right {
-    margin-left: -30px;
+    margin: 12px 0 10px -30px;
 }
 
 #edit-link {
     display: inline-block;
-    margin-left: 6px;
+    margin-left: 14px;
 }
 
 .text-right {
@@ -81,12 +118,11 @@ em#logout {
 }
 
 .sidebar, .even-entry {
-    background-image: url('patterns/ignasi_pattern_s.png'); /* via http://www.subtlepatterns.com */
+    background-image: url('images/ignasi_pattern_s.png'); /* via http://www.subtlepatterns.com */
 }
 
 .new-entry {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 30px;
 }
 
 /* multiline text ellipses, courtesy the example at: */
@@ -118,6 +154,10 @@ em#logout {
 }
 /*                 END: multiline ellipses          */
 
+.entries-list {
+    margin-top: -2px;
+}
+
 .entry-listing {
     box-sizing: border-box;
     border-radius: 4px;
@@ -140,32 +180,36 @@ em#logout {
 }
 
 .tags-bar {
-    background:
-    linear-gradient(
-            rgba(190, 40, 255, 0.10),
-            rgba(0, 190, 255, 0.15)
-        ),
-    url('patterns/sayagata-400px.png'); /* via http://www.subtlepatterns.com */
+    background: linear-gradient(
+                        rgba(255, 200, 100, 0.4),
+                        /* rgba(240, 240, 30, 0.4), */
+                        rgba(255, 100, 0, 0.2)
+                    ), url('images/sayagata-400px.png'); /* via http://www.subtlepatterns.com */
 }
 
 .tags-title {
     font-size: 18px;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+}
+
+.views-div {
+    /* margin-top: 60px; */
+    margin: 60px 0 50px 0;
 }
 
 .btn-primary {
-    margin-top: 10px;
+    margin: 10px 3px auto auto;
     background-color: #c70039;
     border-color: #900c3f;
 }
 
 .btn-primary:hover {
-    background-color: #581845;
+    background-color: #ff3300;
     border-color: #dd0011;
 }
 
 .btn:active, .btn:focus {
-    background-color: #ff55ff !important;
+    background-color: #ff5500 !important;
     border-color: #900c3f !important;
 }
 
@@ -177,11 +221,44 @@ em#logout {
     .tags-bar {
         width: 100%;
         padding: 30px;
-        padding-bottom: 100px;
+    }
+    .tags-title {
+        font-size: 22px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .views-a {
+        display: inline-block;
+        margin-right: 30px;
+    }
+    .views-div {
+        margin-top: 30px;
+    }
+    .invisible-in-mobile {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    a.logout-link {
+        position: absolute;
+        font-size: 14px;
+        right: 13px;
+        z-index: 1;
+    }
+}
+
+
+@media screen and (max-width: 580px) {
+    .btn-lg {
+        width: 100%;
     }
 }
 
 @media screen and (min-width: 1001px) {
+    .visible-in-mobile-only {
+        display: none;
+    }
     .tags-bar {
         padding-top: 150px;
     }

@@ -175,8 +175,10 @@ function updateTagsSidebar() {
         });
         $('.tags-title').text(`Tags for post "${state.current.title}":`);
         var tags = tagsArray.join(', ');
-    } else
-        tags = 'Tags will appear once you\'ve entered something.';
+    } else {
+        $('.tags-title').text('Tags will appear once you\'ve entered something.');
+        tags = '';
+    }
     $('.tags-text').html(tags);
 }
 
@@ -426,7 +428,8 @@ function signUpForm() {
 function logoutBind() {
     // Here, we make a bad Basic Authentication request, and the resulting 401
     // error status should convince our browser to flush existing credentials
-    $('a#logout-link')
+    // $('a#logout-link')
+    $('a.logout-link')
         .html(`${state.author}<br><em id=logout>logout</em>`)
         .click(function(e) {
         window.open(`index.html`, '_self');
