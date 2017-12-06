@@ -4,21 +4,48 @@
 var state = {
     entries: [],
     current: null,
-    author: '',
-    resetCurrent: function() {
-        state.current = state.entries[0];
-        state.author = state.entries[0].author;
-    },
+    author: localStorage.getItem('@JNLP/author'),
+    jwtToken: localStorage.getItem('@JNLP/authToken'),
     globalTags: {},
     // This lets us map from tagged topics back to the posts that were tagged
     // with them. The rationale here is that we can group together common tags.
-    // 
+    //
     // E.g., multiple posts might be given the tag "food."
     // keys:   individual tags from nlpTopics, i.e. ...entry.nlpTopics[i]
     // values: arrays of `entries' that contained the given tag.
 
+    clearState: function() {
+        localStorage.removeItem('@JNLP/author');
+        localStorage.removeItem('@JNLP/authToken');
+        state = {
+            entries: [],
+            current: null,
+            author: null,
+            jwtToken: null,
+            globalTags: {}
+        };
+    },
+    populateState: function() {
+        return getEntries()
+            .done(function(data) {
+                state.entries = data;
+                state.resetCurrent();
+            });
+    },
+    resetCurrent: function() {
+        state.current = state.entries[0];
+        state.author = state.entries[0].author;
+    },
+    setAuthor: function(value) {
+        localStorage.setItem('@JNLP/author', value),
+        state.author = value;
+    },
+    setJwt: function(value) {
+        localStorage.setItem('@JNLP/authToken', value);
+        state.jwtToken = value;
+    },
     sortTags: function() {
-        // this is the function that does the above mapping for us
+        // This is the function that does the above mapping for us
         state.globalTags = {};
         state.entries.forEach(function(entry) {
             entry.nlpTopics.forEach(function(tag) {
@@ -38,14 +65,14 @@ var state = {
 };
 
 function findById(id) {
-    let entry = state.entries.filter(function(obj) {
+    // Returns the entry with the given id
+    return state.entries.filter(function(obj) {
         return obj.id == id;
     })[0];
-    return entry;
 }
 
 function findByIdAndRemove(id) {
-    let entry = state.entries.filter(function(obj) {
+    var entry = state.entries.filter(function(obj) {
         return obj.id == id;
     })[0];
 
@@ -53,95 +80,41 @@ function findByIdAndRemove(id) {
 }
 
 //// API-access functions
-
-/////// The following five functions are a hack that lets us log out AND use
-/////// a demo user account. I find them inelegant, but here they are.
-function getAuthVal() {
-    var re = new RegExp('Authorization' + "=([^;]+)");
-    var value = re.exec(document.cookie);
-    return (value != null) ? unescape(value[1]) : null;
-}
-
-function clearCredentials() {
-    if (getAuthVal() !== btoa('demo_account:abc123'))
-        document.cookie = 'Authorization=';
-}
-
-function setCredentials(username, password) {
-    var auth = btoa(`${username}:${password}`);
-    document.cookie = 'Authorization='+auth;
-}
-
-function setHeader(xhr) {
-    if (getAuthVal()) {
-        xhr.setRequestHeader('Authorization', 'Basic '+ getAuthVal());
-    }
-}
-
-function authenticatedReq(username, password) {
+function makeRequest(url, httpVerb, data) {
     return $.ajax({
-        beforeSend: function(xhr) {
-            setCredentials(username, password);
-            setHeader(xhr);
+        url: url,
+        type: httpVerb,
+        headers: {
+            'Authorization': 'Bearer '+ state.jwtToken,
+            'Content-Type': 'application/json'
         },
-        type: 'GET',
-        url: '../api/entries'
+        data: JSON.stringify(data)
     });
 }
-//////
 
+function submitLogIn(data) {
+    return makeRequest('../api/log_in/', 'POST', data);
+}
 
 function submitSignUp(data) {
-    return $.post({
-        url: '../api/user_account',
-        beforeSend: setHeader,
-        data: JSON.stringify(data),
-        dataType: 'json',
-        contentType: 'application/json'
-    });
+    return makeRequest('../api/user_account/', 'POST', data);
 }
 
-function populateState() {
-    return $.getJSON({
-        url:'../api/entries',
-        beforeSend: setHeader
-    })
-        .done(function(data) {
-            state.entries = data;
-            state.resetCurrent();
-        });
+// function populateState() {
+function getEntries() {
+    return makeRequest('../api/entries/', 'GET');
 }
 
 function submitEntry(data) {
-    return $.post({
-        url: '../api/entries',
-        beforeSend: setHeader,
-        data: JSON.stringify(data),
-        dataType: 'json',
-        contentType: 'application/json'
-    });
+    return makeRequest('../api/entries/', 'POST', data);
 }
 
 function editEntry(data) {
-    return $.ajax({
-        url: '../api/entries/' + data.id,
-        beforeSend: setHeader,
-        type: 'PUT',
-        data: JSON.stringify(data),
-        dataType: 'json',
-        contentType: 'application/json'
-    });
+    return makeRequest('../api/entries/'+data.id, 'PUT', data);
 }
 
 function deleteEntry(id) {
-    return $.ajax({
-        url: '../api/entries/' + id,
-        beforeSend: setHeader,
-        type: 'DELETE',
-        data: JSON.stringify({id: id}),
-        dataType: 'json',
-        contentType: 'application/json'
-    });
+    return makeRequest('../api/entries/'+id, 'DELETE', { id: id });
 }
 
 
@@ -152,7 +125,7 @@ function getQueryString() {
 
 function updateEntriesSidebar() {
     // write-entry.html AND view-entry.html
-    // updates the left pane on desktop--our listing of entries
+    // Updates the left pane on desktop--our listing of entries
     state.entries.forEach(function(ent) {
         $('.entries-container').append(
             `<div class="sidebar-entry"><a href="view-entry.html?${ent.id}">`
@@ -166,7 +139,7 @@ function updateEntriesSidebar() {
 
 function updateTagsSidebar() {
     // write-entry.html AND view-entry.html
-    // updates the right pane on desktop--our local document's tags
+    // Updates the right pane on desktop--our local document's tags
     if (findById(getQueryString())) {
         var tagsArray = [];
         state.current.nlpTopics.forEach(function(tag) {
@@ -182,10 +155,9 @@ function updateTagsSidebar() {
     $('.tags-text').html(tags);
 }
 
-////
 function addListingsButtonsProperties(id, title) {
     // listings.html, subordinate
-    // this adds properties to the individual entries on our entries screen
+    // This adds properties to the individual entries on our entries screen
 
     // view button
     $('#view_'+id).click(function() {
@@ -203,9 +175,9 @@ function addListingsButtonsProperties(id, title) {
         if (ans) {
             deleteEntry(id)
                 .catch(function() { window.open('listings.html', '_self'); });
-            //^this isn't especially robust error handling; it just reloads the
-            // page if the deletion fails. I suppose so that the page reflects the
-            // server's state
+            //^This isn't especially robust error handling; it just reloads the
+            // page if the deletion fails. I suppose so that the page reflects
+            // the server's state
             findByIdAndRemove(id);
             state.sortTags();
             updateListingsView();
@@ -225,7 +197,7 @@ function displayGlobalTags() {
 
 function getListings() {
     // listings.html, subordinate
-    // returns the subset of entries for listings.html to display, and the
+    // Returns the subset of entries for listings.html to display, and the
     // correct title
     var query = decodeURIComponent(getQueryString());
     if (state.globalTags[query]) {
@@ -290,10 +262,10 @@ function updateEntryView() {
     // view-entry.html, main
     if (state.current) {
         $('.title').text(state.current.title);
-        $('.entry').text(state.current.body);
+        var obj = $('.entry').text(state.current.body);
+        obj.html(obj.html().replace(/\n/g,'<br/>'));
         if(state.current.lastUpdateAt)
             $('p#last-update-at').text(`last update: ${state.current.lastUpdateAt}`);
-        // $('.entry-display').append(`<a class="text-right" href="write-entry.html?${state.current.id}">edit</a>`);
         $('a#edit-link').attr('href', `write-entry.html?${state.current.id}`);
         $('a#delete-link').click(function(e) {
             e.preventDefault();
@@ -331,7 +303,6 @@ function writeEditButtons() {
         var body =  $('#body-text').val().trim();
         var inputs = findById(getQueryString()) || {};
 
-        // if (inputs.title === title && inputs.body === body) {
         if (inputs.title === title && inputs.body === body) {
             window.open(`view-entry.html?${getQueryString()}`, '_self');
         } else if (title.length || body.length) {
@@ -407,34 +378,70 @@ function preventErasedComment() {
     });
 }
 
-function signUpForm() {
-    $('a#signup-submit').click(submitButton);
+function signUpLoginSetHeaders() {
+    if (document.location.hash.includes('#log-in'))
+        $('#log-in-h').addClass('sign-log-selected');
+    else if (document.location.hash.includes('#sign-up'))
+        $('#sign-up-h').addClass('sign-log-selected');
+
+    $('#sign-up-h').click(function() {
+        $('#log-in-h').removeClass('sign-log-selected');
+        $('#sign-up-h').addClass('sign-log-selected');
+    });
+
+    $('#log-in-h').click(function() {
+        $('#log-in-h').addClass('sign-log-selected');
+        $('#sign-up-h').removeClass('sign-log-selected');
+    });
+
+}
+
+function signUpLoginForm() {
+    // Logic for sign-up-or-login.html
+    signUpLoginSetHeaders();
+    $('a#signup-login-submit').click(submitButton);
+
     $(document).keydown(function(e) {
         if (e.which === 13)
             submitButton(e);
     });
     function submitButton(e) {
-        submitSignUp({ username: $('#username').val().trim(),
-                       password: $('#password').val().trim() })
-            .done(function() { window.open(`write-entry.html?`, '_self'); })
-            .fail(function(err) {
-                if (err.status == 500)
-                    $('p#username-taken').text('looks like that username\'s taken!');
-            });
-    }
+        var username = $('#username').val().trim();
+        var password = $('#password').val().trim();
 
+        if (!username.length)
+            $('p#username-taken').text('enter a username');
+        else if (!password.length)
+            $('p#username-taken').text('enter a password');
+        else {
+            var fn = document.location.hash.includes('#log-in') ? submitLogIn : submitSignUp;
+            var submission = { username: username, password: password };
+            fn(submission)
+                .done(function(response) {
+                    state.setAuthor(submission.username);
+                    state.setJwt(response);
+                    window.open(`write-entry.html?`, '_self');
+                })
+                .fail(function(err) {
+                    if (err.status == 409)
+                        $('p#username-taken').text('looks like that username\'s taken');
+                    else if (err.status == 404)
+                        $('p#username-taken').text('username doesn\'t exist');
+                    else if (err.status == 401)
+                        $('p#username-taken').text('wrong password');
+                    else
+                        $('p#username-taken').text('server error');
+                });
+        }
+    }
 }
 
 function logoutBind() {
-    // Here, we make a bad Basic Authentication request, and the resulting 401
-    // error status should convince our browser to flush existing credentials
-    // $('a#logout-link')
     $('a.logout-link')
         .html(`${state.author}<br><em id=logout>logout</em>`)
         .click(function(e) {
-        window.open(`index.html`, '_self');
-        authenticatedReq('A(W#JG(WJGAW(#JGW(#JGWJ#))))',
-                         '0aw3g98gj03aw9gja30wgn9jg0n3ajg03gwj' );
+            window.open(`sign-up-or-in.html#log-in`, '_self');
+            state.clearState();
     });
 }
 
@@ -443,14 +450,18 @@ function demoLogin() {
     // -accounts that we'll CRON-delete after some amount of inactivity
     $('a#demo-button').click(function(e) {
         e.preventDefault();
-        authenticatedReq('demo_account', 'abc123')
-            .done(function() { window.open('listings.html', '_self'); });
+        submitLogIn({ username: 'demo_account', password: 'abc123' })
+            .done(function(response) {
+                state.setAuthor('demo_account');
+                state.setJwt(response);
+                window.open('listings.html', '_self');
+            });
     });
 }
 
-//// high-level functions for our different screens
+//// High-level functions for our different screens
 function viewEntryUpdate() {
-    return populateState()
+    return state.populateState()
         .then(state.updateState)
         .then(updateEntriesSidebar)
         .then(updateEntryView)
@@ -459,7 +470,7 @@ function viewEntryUpdate() {
 }
 
 function writeEntryUpdate() {
-    return populateState()
+    return state.populateState()
         .then(state.updateState)
         .then(updateEntriesSidebar)
         .then(updateTagsSidebar)
@@ -470,18 +481,17 @@ function writeEntryUpdate() {
 }
 
 function listingsUpdate() {
-    return populateState()
+    return state.populateState()
         .done(state.sortTags)
         .done(updateListingsView)
         .then(logoutBind);
 }
 
 function signUp() {
-    return signUpForm();
+    return signUpLoginForm();
 }
 
 function dispatch() {
-    clearCredentials();
     if ($('body#view-entry').length)  { viewEntryUpdate(); };
     if ($('body#write-entry').length) { writeEntryUpdate(); };
     if ($('body#listings').length)    { listingsUpdate(); };

@@ -6,24 +6,26 @@ const mongoose = require('mongoose');
 const notesEntrySchema = mongoose.Schema({
     title:{
         type: String,
-        required: true
+        trim: true,
+        required: true,
     },
     body: {
         type: String,
-        required: true
+        trim: true,
+        required: true,
     },
     author: {             // account name
         type: String,
-        required: true
+        required: true,
     },
     nlpTopics: [{ type: String }],
     publishedAt: {
         type: Date,
-        default: Date.now
+        default: Date.now,
     },
     lastUpdateAt: {
         type: Date,
-        default: null
+        default: null,
     }
 });
 
@@ -40,7 +42,7 @@ notesEntrySchema.methods.apiRepr = function() {
         nlpTopics: this.nlpTopics,
         // nlpTopics: this.cleanedUpNlpTopics
         publishedAt: this.publishedAt,
-        lastUpdateAt: this.lastUpdateAt
+        lastUpdateAt: this.lastUpdateAt,
     };
 };
 
@@ -53,21 +55,23 @@ const userAccountSchema = mongoose.Schema({
     username: {
         type: String,
         require: true,
+        trim: true,
         unique: true,
         validate: {
             validator: (str) => /[a-zA-Z0-9_]+/.test(str),
-            message: 'Poorly-formed name'
-        }
+            message: 'Poorly-formed name',
+        },
     },
     password: {
         type: String,
         require: true,
+        trim: true,
         validate: {
             validator: (str) => str.length > 5,
-            message: 'Password\'s not long enough'
+            message: 'Password\'s not long enough',
         }
     },
-    posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Entry'}]   // /journal entries/notes/whatever
+    posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Entry'}],  // /Journal entries/notes/whatever
 });
 
 userAccountSchema.methods.validatePassword = function(password) {
@@ -86,7 +90,7 @@ userAccountSchema.methods.apiRepr = function() {
     return {
         id: this._id,
         username: this.username,
-        posts: this.posts.reverse()
+        posts: this.posts.reverse(),
     };
 };
 

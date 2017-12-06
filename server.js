@@ -2,26 +2,23 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
-
 const cron = require('node-cron');
-const {resetDemoAccount} = require ('./bin/demo_account_refresh');
 
-const {DATABASE_URL, PORT} = require('./config');
+const { resetDemoAccount } = require ('./bin/demo_account_refresh');
+const { DATABASE_URL, PORT } = require('./config');
 
 // ES6-style promises for mongoose
 mongoose.Promise = global.Promise;
 
-const {router: apiRouter} = require('./api');
+const { router: apiRouter } = require('./api');
 
 const app = express();
-app.use(morgan('dev'));
+app.use(morgan('dev'), bodyParser.json());
 app.use(bodyParser.json());
 
-// getting down to some actual serving:
+// Getting down to some actual serving:
 app.use(express.static('public')); // /public/ now serves static files
-
 app.use('/api/', apiRouter);
-
 app.use('*', function(req, res) {
     res.status(404).json({message: 'Resource not found'});
 });
@@ -59,18 +56,16 @@ function closeServer() {
     });
 }
 
-// if we call server.js, directly (`node server.js'). this block runs
+// If we call server.js, directly (`node server.js'). this block runs
 if (require.main === module) {
     runServer().catch(err => console.error(err));
 }
 
-// we export runServer and closeServer so that other code (right now, just
+// We export runServer and closeServer so that other code (right now, just
 // tests) can start/close the server, at will. Our db-oriented test will need
 // to start & close, over and over.
-module.exports = {runServer, closeServer, app};
+module.exports = { runServer, closeServer, app };
 
 
-// scheduled refresh of our demo account, once every 10 minutes
-cron.schedule('*/10 * * * *', () => {
-    resetDemoAccount();
-}, null, false);
+// Scheduled refresh of our demo account, once every 10 minutes
+cron.schedule('*/10 * * * *', () => resetDemoAccount(), null, false);

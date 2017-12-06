@@ -11,13 +11,13 @@
 // on IP, and then have a nightly cron job to delete them. This is good enough,
 // for now, though.
 
-const {http} = require('http');
+const { http } = require('http');
 const request = require('request-promise');
-
-const {UserAccount, Entry} = require('../api');
-const [UserAccounts, Entries] = [UserAccount, Entry];
-const {PORT, DATABASE_URL} = require('../config');
 const mongoose = require('mongoose');
+
+const { UserAccount, Entry } = require('../api');
+const [ UserAccounts, Entries ] = [ UserAccount, Entry ];
+const { PORT, DATABASE_URL } = require('../config');
 
 const username = 'demo_account';
 const password = 'abc123';
@@ -25,62 +25,59 @@ const password = 'abc123';
 function dropDemoAccount() {
     // Deletes our demo_account. We're skipping the endpoint, on the off chance
     // someone malicious has changed the password
+    //
+    // Subordinate function
     console.log('[bin/demo_account_refresh] :: Dropping `demo_account`');
-    const p1 = Entries
-              .remove({author: username})
-              .exec();
-    const p2 = UserAccounts
-              .remove({username: username})
-              .exec();
-    return Promise.all([p1, p2]);
+    return Promise.all([ Entries.remove({ author: username }).exec(),
+                         UserAccounts.remove({ username: username }).exec() ]);
 }
 
-const base = {
-    method: 'POST',
-    headers: {
-        'content-type': 'application/json'
-    }
-};
 function createDemoAccount() {
-    const req = {
+    // Subordinate function
+    return request({
+        method: 'POST',
         url: `http://localhost:${PORT}/api/user_account`,
-        body: JSON.stringify({
-            username: username,
-            password: password
-        })
-    };
-    return request(Object.assign(req, base));
-}
-
-function postPost(post) {
-    // this will, um...POST a post
-    const req = {
-        url: `http://localhost:${PORT}/api/entries`,
-        auth: {
-            user: username,
-            password: password
+        headers: {
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(post)
-    };
-    return request(Object.assign(req, base));
+        body: JSON.stringify({ username, password })
+    });
 }
 
-function createPosts() {
-    // Issues a POST for every entry in our data, below
-    console.log('[bin/demo_account_refresh] :: Creating posts for `demo_account`...');
-    for (let post of data)
-        postPost(post);
+function postPost(jwt, post) {
+    // Subordinate function
+    return request({
+        method: 'POST',
+        url: `http://localhost:${PORT}/api/entries`,
+        headers: {
+            Authorization: 'Bearer '+ JSON.parse(jwt),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(post),
+    });
 }
 
 function resetDemoAccount() {
-    dropDemoAccount()
+    // The function we actually call (with cron)
+    // - Drops demo_account record
+    // - POSTs a new demo_account
+    // - POSTs the collection of posts in `data`
+    //
+    // Main function
+    return dropDemoAccount()
         .then(createDemoAccount)
-        .then(createPosts)
+        .then(jwt => {
+            console.log('[bin/demo_account_refresh] :: Creating posts for `demo_account`...');
+            console.log(jwt);
+            for (let post of data)
+                // Issues a POST for every entry in our `data`, below
+                postPost(jwt, post);
+        })
         .then(() => console.log('[bin/demo_account_refresh] :: `demo_account` refreshed!'))
         .catch(err => console.log('[bin/demo_account_refresh] :: '+ err));
 }
 
-module.exports = {resetDemoAccount};
+module.exports = { resetDemoAccount };
 
 
 //////////////////////////////////

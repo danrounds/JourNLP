@@ -83,9 +83,11 @@ textarea:focus {
 
 .project-name {
     color: #777;
+    cursor: default;
     font-family: 'Manuale', serif;
     font-size: 40px;
     font-weight: bold;
+    user-select: none;
 }
 
 .portfolio-link {
@@ -267,6 +269,6 @@ em#logout {
         display: -webkit-box;
         display: -webkit-flex;
         display: -ms-flexbox;
-        display:         flex;
+        display: flex;
     }
 }

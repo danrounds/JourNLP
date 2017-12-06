@@ -1,40 +1,17 @@
 const express = require('express');
-const jsonParser = require('body-parser').json();
-const {BasicStrategy} = require('passport-http');
-const passport = require('passport');
-
-const {UserAccount, Entry} = require('./models');
-const {nlpCategorize} = require('./nlp');
-
 const router = express.Router();
-const Entries = Entry;          // I hate mongoose's naming conventions
-const UserAccounts = UserAccount;
+const jwt = require('jwt-simple');
 
-router.use(jsonParser);
+const { UserAccount, Entry } = require('./models');
+const { nlpCategorize } = require('./nlp');
+const auth = require('./jwtAuthentication');
+const cfg = require('../config');
 
-const strategy = new BasicStrategy((username, password, cb) => {
-    let user;
-    return UserAccounts
-        .findOne({username: username})
-        .exec()
-        .then(user => {
-            if (!user)
-                return cb(null, false, {message: 'Incorrect username'});
-            return user.validatePassword(password)
-                .then(isValid => {
-                    if (!isValid)
-                        return cb(null, false, {message: 'Incorrect password'});
-                    return cb(null, user); // success!
-                });
-        })
-        .catch(err => cb(err));
-});
+// Our authentication
+router.use(auth.initialize());
 
-passport.use(strategy);
-router.use(passport.initialize());
-
-function checkFields(body, fields) {
-    // checks for presence of fields[i] in our request body
+function isFieldMissing(body, fields) {
+    // Checks for presence of fields[i] in our request body
     for (let field of fields) {
         if (!body.hasOwnProperty(field))
             return `Missing "${field}" in request body`;
@@ -42,49 +19,49 @@ function checkFields(body, fields) {
     return false;
 }
 
-
 // ENDPOINTS:
 // /entries/.* endpoints
-router.get('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // this returns an array of the authenticated user's notes entries
+router.get('/entries/', auth.authenticate(), (req, res) => {
+    // This returns an array of the authenticated user's notes entries.
     // The simplest way to add entries (see, POST) is to just push onto the end
     // of an array of post ids; the result is sorted with oldest posts, first.
     // This isn't quite what we want, hence `entries.posts.reverse()`, below.
-    return UserAccounts
-        .findOne({username: req.user.username}, 'posts')
+    return UserAccount
+        .findOne({ username: req.user.username }, 'posts')
         .populate('posts')
         .then(entries => {
             entries = entries.posts.reverse();
-            res.json(entries.map(entry => entry.apiRepr()));
+            return res.json(entries.map(entry => entry.apiRepr()));
         })
         .catch(err => res.sendStatus(500));
 });
 
-router.get('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
-    // this returns the entry with the specific id, assuming it belongs to the authenticated user
-    return Entries
+router.get('/entries/:id', auth.authenticate(), (req, res) => {
+    // This returns the entry with the specific id, assuming it belongs to the
+    // authenticated user
+    return Entry
         .findById(req.params.id)
         .exec()
         .then(entry => {
             if (req.user.username === entry.author)
-                res.json(entry.apiRepr());
+                return res.json(entry.apiRepr());
             else
-                res.sendStatus(403);
+                return res.sendStatus(403);
         })
         .catch(err => res.sendStatus(500));
 });
 
-router.post('/entries/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // submits/saves an entry, associated with the given user account
-    const fieldMissing = checkFields(req.body, ['title','body']);
+router.post('/entries/', auth.authenticate(), (req, res) => {
+    // Submits/saves an entry, associated with the given user account
+    const fieldMissing = isFieldMissing(req.body, ['title','body']);
     if (fieldMissing) {
         return res.status(400).json(fieldMissing);
     }
 
-    const title = req.body.title.trim();
-    const body = req.body.body.trim();
+    const title = req.body.title;
+    const body = req.body.body;
     return nlpCategorize(title + '. ' + body)
-        .then(nlpTopics => Entries
+        .then(nlpTopics => Entry
               .create({
                   author: req.user.username,
                   title,
@@ -92,8 +69,8 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
                   nlpTopics,
               })
               .then(entry => {
-                  UserAccounts
-                      .findOne({username: req.user.username})
+                  UserAccount
+                      .findOne({ username: req.user.username })
                       .exec()
                       .then(user => {
                           user.posts.push(entry._id);
@@ -106,8 +83,8 @@ router.post('/entries/', passport.authenticate('basic', {session: false}), (req,
               .catch(() => res.sendStatus(500)));
 });
 
-router.put('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
-    // for editing an entry--either its `title' and/or its `body'
+router.put('/entries/:id', auth.authenticate(), (req, res) => {
+    // For editing an entry--either its `title' and/or its `body'
     if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
         res.status(400).json({ error: 'Request\'s PATH id and BODY id values must match' });
     }
@@ -119,97 +96,128 @@ router.put('/entries/:id', passport.authenticate('basic', {session: false}), (re
         }
     });
 
-    return Entries.findById(req.params.id)
-    // make sure the author is the one editing the entry
+    return Entry.findById(req.params.id)
+    // Make sure the author is the one editing the entry
         .then(entry => {
             if (req.user.username !== entry.author)
                 res.sendStatus(403); // 403: Forbidden
             return req.body.title || entry.title;
         })
-        .then((title) => {
-            nlpCategorize(title + '. ' + req.body.body)
-                .then(nlpTopics => {
-                    updated.nlpTopics = nlpTopics;
-                    updated.lastUpdateAt = Date.now();
-                    Entries
-                        .findByIdAndUpdate(req.params.id, {$set: updated}, {new: true})
-                        .exec()
-                        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()));
-                });
-        })
+        .then(title => nlpCategorize(title + '. ' + req.body.body)
+              .then(nlpTopics => {
+                  updated.nlpTopics = nlpTopics;
+                  updated.lastUpdateAt = Date.now();
+                  return Entry
+                      .findByIdAndUpdate(req.params.id,
+                                         { $set: updated },
+                                         { new: true })
+                      .exec()
+                      .then(updatedPost => res.status(201).json(updatedPost.apiRepr()));
+              }))
         .catch(err => res.sendStatus(500));
 });
 
-router.delete('/entries/:id', passport.authenticate('basic', {session: false}), (req, res) => {
-    // deletes the entry with the given id
-    return Entries
+router.delete('/entries/:id', auth.authenticate(), (req, res) => {
+    // Deletes the entry with the given id
+    return Entry
         .findByIdAndRemove(req.params.id)
         .exec()
-        .then(() => res.status(204).json({message: 'success'}))
-        .catch(err => res.status(500).json({error: 'Something went wrong'}));
+        .then(() => res.sendStatus(204))
+        .catch(err => res.sendStatus(500));
 });
 
 // /user_account/ endpoints
-router.get('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // returns the user-relevant data associated with the authenticated user
-    return UserAccounts
-        .findOne({username: req.user.username})
+router.get('/user_account/', auth.authenticate(), (req, res) => {
+    // Returns the user-relevant data associated with the authenticated user
+    return UserAccount
+        .findOne({ username: req.user.username })
         .populate('posts')
         .then(userData => res.json(userData.apiRepr()))
-        .catch(err => res.status(500).json({error: 'Something went wrong'}));
+        .catch(err => res.sendStatus(500));
+});
+
+router.post('/log_in', (req, res) => {
+    // Log in endpoint -- returns the relevant JWT token
+    if (req.body.username && req.body.password) {
+        return UserAccount.findOne({ username: req.body.username })
+            .then(userAccount => {
+                if (!userAccount)
+                    return res.sendStatus(404); // Name doesn't exist
+
+                return userAccount.validatePassword(req.body.password)
+                    .then(isValid => {
+                        if (isValid) {
+                            const payload = { id: userAccount._id, username: userAccount.username };
+                            const token = jwt.encode(payload, cfg.JWT_SECRET);
+                            res.status(200).json(token);
+                        } else {
+                            res.sendStatus(401);
+                        }
+                    });
+            })
+            .catch(() => res.sendStatus(500));
+    }
+    res.sendStatus(401);
 });
 
 router.post('/user_account/', (req, res) => {
-    // creates a user account, with username: username, and password: password
-    const fieldMissing = checkFields(req.body, ['username', 'password']);
+    // Creates a user account, with { username, password }
+    // Returns the relevant JWT token
+    const fieldMissing = isFieldMissing(req.body, ['username', 'password']);
     if (fieldMissing) {
-        return res.status(400).json({error: fieldMissing});
+        return res.status(400).json({ error: fieldMissing });
     }
-    return UserAccounts.hashPassword(req.body.password.trim())
-        .then(hash => {
-            UserAccounts
-                .create({
-                    username: req.body.username.trim(),
-                    password: hash
-                })
-                .then(user => res.status(201).json(user.apiRepr()))
-                .catch(err => {
-                    if (err.name == 'ValidationError')
-                        res.status(422).json({message: err.errors.username.message});
-                    else
-                        // I'm not sure I want the server exposing whether accounts exist
-                        res.status(500).json({message: 'Something went wrong'});
-                });
-        });
+
+    return UserAccount.findOne({ username: req.body.username })
+        .then(exists => {
+            if (exists)
+                return res.sendStatus(409); // name conflict
+        })
+        .then(() => UserAccount.hashPassword(req.body.password)
+              .then(hashed => UserAccount
+                    .create({
+                        username: req.body.username,
+                        password: hashed
+                    })
+                    .then(userAccount => {
+                        console.log(userAccount);
+                        const payload = { id: userAccount._id, username: userAccount.username };
+                        const token = jwt.encode(payload, cfg.JWT_SECRET);
+                        return res.status(201).json(token);
+                    })
+                    .catch(err => {
+                        if (err.name == 'ValidationError')
+                            res.status(422).json({ message: err.errors.username.message });
+                        else
+                            // I'm not sure I want the server exposing whether accounts exist
+                            res.sendStatus(500);
+                    })));
 });
 
-router.put('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // used solely to update a user's password
-    const fieldMissing = checkFields(req.body, ['username','newPassword']);
+router.put('/user_account/', auth.authenticate(), (req, res) => {
+    // Used solely to update a user's password
+    const fieldMissing = isFieldMissing(req.body, ['username','newPassword']);
     if (fieldMissing) {
-        return res.status(400).json({error: fieldMissing});
+        return res.status(400).json({ error: fieldMissing });
     }
-    return UserAccounts.hashPassword(req.body.newPassword.trim())
-        .then(hash => {
-            UserAccounts
-                .update(
-                    {username: req.user.username.trim()},
-                    // {$set: {'password': req.body.newPassword.trim()}},
-                    {$set: {'password': hash}},
-                    {runValidators: true}
-                )
-                .then(updated => res.sendStatus(204))
-                .catch(err => res.sendStatus(500));
-        });
+    return UserAccount.hashPassword(req.body.newPassword)
+        .then(hashed => UserAccount
+              .update(
+                  { username: req.user.username },
+                  { $set: { 'password': hashed }},
+                  { runValidators: true }
+              )
+              .then(updated => res.sendStatus(204))
+              .catch(err => res.sendStatus(500)));
 });
 
-router.delete('/user_account/', passport.authenticate('basic', {session: false}), (req, res) => {
-    // deletes entries and the authenticated user account
-    const p1 = Entries
-              .remove({author: req.user.username})
+router.delete('/user_account/', auth.authenticate(), (req, res) => {
+    // Deletes entries and the authenticated user account
+    const p1 = Entry
+              .remove({ author: req.user.username })
               .exec();
-    const p2 = UserAccounts
-              .remove({username: req.user.username})
+    const p2 = UserAccount
+              .remove({ username: req.user.username })
               .exec();
 
     return Promise.all([p1, p2])
@@ -217,4 +225,4 @@ router.delete('/user_account/', passport.authenticate('basic', {session: false})
         .catch(err => res.sendStatus(500));
 });
 
-module.exports = {router};
+module.exports = { router };

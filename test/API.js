@@ -3,120 +3,61 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const faker = require('faker');
 const mongoose = require('mongoose');
 
-const {nlpCategorize, Entry, UserAccount} = require('../api');
-const Entries = Entry;               // mongoose likes singular nouns
-const UserAccounts = UserAccount;    // ...but I don't
-
+const { Entry, UserAccount } = require('../api');
 const { app, runServer, closeServer } = require('../server');
-const { TEST_DATABASE_URL } = require('../config');
+const { TEST_DATABASE_URL, TEST_PORT } = require('../config');
+const { tearDownDb, seedDb } = require('./_setup');
+const { generateEntry } = require('./_fake');
 
-// lets us use THING.should.have/THING.should.be-style constructs
+// Lets us use THING.should.have/THING.should.be-style constructs
 const should = chai.should();
 chai.use(chaiHttp);
 
-const [username, password] = ['test_account', 'password'];
-
-// populates our database with plausible-seeming journal-entry data
-// function postEntries() {
-function postEntries() {
-    console.info('Seeding notes/journal-entry db records');
-
-    const dbQueries = [];
-    return UserAccounts.hashPassword(password)
-        .then(hash => {
-            UserAccounts
-                .create({
-                    username: username,
-                    password: hash
-                });
-        })
-        .then(() => {
-            for (let i = 0; i < 10; i++) {
-                dbQueries.push(Entries
-                    .create(generateEntry())
-                    .then(entry => {
-                        UserAccounts
-                            .findOne({username: username})
-                            .exec()
-                            .then(user => {
-                                user.posts.push(entry._id);
-                                user.save();
-                            });
-                    }));
-            }
-        })
-        .then(() => Promise.all(dbQueries));
-}
-
-// Faker makes us some nice-looking fake journal entries
-function generateEntry() {
-    return  {
-        title: faker.random.words(4),
-        body: faker.lorem.paragraph() + '\n\n'
-            + faker.lorem.paragraph() + '\n\n'
-            + faker.lorem.paragraph() + '\n\n'
-            + faker.lorem.paragraph() + '\n\n'
-            + faker.lorem.paragraph() + '\n\n'
-            + faker.lorem.paragraph() + '\n\n'
-            + faker.lorem.paragraph() + '\n\n'
-            + faker.lorem.paragraph(),
-        author: username,
-        nlpTopics: ['abc', 'def', 'ghi', 'jkl', 'mno'],
-    };
-}
-
-function tearDownDb() {
-    console.warn('Clearing db records');
-    return mongoose.connection.dropDatabase();
-}
-
-// our actual tests
+// Our actual tests
 describe('Journal/notes entries API endpoints,', function() {
 
+    let dataToSend;
     this.timeout(5000);
 
-    before(() => Promise.all([runServer(TEST_DATABASE_URL), tearDownDb()]));
-
-    beforeEach(() => postEntries());
-
+    before(() => Promise.all([runServer(TEST_DATABASE_URL, TEST_PORT), tearDownDb()]));
+    beforeEach(() => seedDb()
+               .then(data => dataToSend = data));
     afterEach(() => tearDownDb());
-
     after(() => closeServer());
 
 
     describe('GET endpoint :: /api/entries/.*', () => {
         // strategy:
         //  1. GET journal entries (via server...and indirectly, our db)
-        //  2. check returned status # and data type of response
-        //  3. make sure returned entries's N equals the number of records we
+        //  2. Check returned status # and data type of response
+        //  3. Make sure returned entries's N equals the number of records we
         //     populated our db with
         it('should return all of our entries', () => {
             let res;
             return chai.request(app)
                 .get('/api/entries')
-                .auth(username, password)
+                .set('Authorization', `Bearer ${dataToSend.token}`)
                 .then((_res) => {
                     res = _res;
                     res.should.have.status(200);
-                    return Entries.count();
+                    return Entry.count();
                 })
-                .then((count) => { res.body.should.have.length.of(count); });
+                .then(count => { res.body.should.have.length.of(count); });
         });
 
         it('should return entries (records) with the right fields and data', () => {
-            // strategy:
+            // Strategy:
             //  1. GET journal entries, via server (& db-backing)
-            //  2. make sure response is a JSON array (as per our API)
-            //  3. check that required keys are present in our response
-            //  4. make sure our response's fields match the fields in the
+            //  2. Make sure response is a JSON array (as per our API)
+            //  3. Check that required keys are present in our response
+            //  4. Make sure our response's fields match the fields in the
             //     corresponding database record
             let resEntry;       // this'll be array[0], of our response
             return chai.request(app)
                 .get('/api/entries')
-                .auth(username, password)
+                .set('Authorization', `Bearer ${dataToSend.token}`)
                 .then(res => {
                     res.should.be.json;
                     res.body.should.be.a('array');
@@ -128,8 +69,8 @@ describe('Journal/notes entries API endpoints,', function() {
                             'title', 'body', 'author', 'nlpTopics');
                     });
                     resEntry = res.body[0];
-                    // \/ look up db entry that corresponds with response[0]
-                    return Entries.findById(resEntry.id).exec();
+                    // \/ Look up db entry that corresponds with response[0]
+                    return Entry.findById(resEntry.id).exec();
                 })
                 .then(entryRecord => {
                     resEntry.id.should.equal(entryRecord.id);
@@ -141,20 +82,20 @@ describe('Journal/notes entries API endpoints,', function() {
         });
 
         it('should return a specific journal/note entry if accessed as /api/entries/:id endpoint', () => {
-            // strategy:
+            // Strategy:
             //  1. `fineOne` entry from the database and extracts its id
-            //  2. make a get request to /api/entries/:id (the id from above)
-            //  3. check that the response has the right status and that all
+            //  2. Make a get request to /api/entries/:id (the id from above)
+            //  3. Check that the response has the right status and that all
             //     its fields match the database entry's fields
             let record;
-            return Entries
+            return Entry
                 .findOne()
                 .exec()
                 .then((_record) => {
                     record = _record;
                     return chai.request(app)
                         .get(`/api/entries/${record.id}`)
-                        .auth(username, password);
+                        .set('Authorization', `Bearer ${dataToSend.token}`);
                 })
                 .then((res) => {
                     res.should.have.status(200);
@@ -166,72 +107,78 @@ describe('Journal/notes entries API endpoints,', function() {
                     entry.nlpTopics.join().should.equal(record.nlpTopics.join());
                 });
         });
+        it('should fail on bad authorization', () => chai.request(app)
+           .get('/accounts')
+           .set('Authorization', `Bearer ${dataToSend.token+123}`) // bad token
+           .catch(res => res.status.should.equal(404)));
     });
 
     describe('POST endpoint :: /api/entries/', () => {
-        // strategy:
-        //  1. generate random JSON data for a new journal entry
-        //  2. make POST request
-        //  3. check status and compare server response to the data we
+        // Strategy:
+        //  1. Generate random JSON data for a new journal entry
+        //  2. Make POST request
+        //  3. Check status and compare server response to the data we
         //     generated/submitted. They should obviously be the same
-        //  4. examine the relevant database entry to see if it also matches
+        //  4. Examine the relevant database entry to see if it also matches
         //     the response
         it('should add a new entry', () => {
-            const submittedEntry = generateEntry(); // random `entry' data
+            // Random `entry' data:
+            const submittedEntry = generateEntry(dataToSend.username);
 
             return chai.request(app)
                 .post('/api/entries')
-                .auth(username, password)
+                .set('Authorization', `Bearer ${dataToSend.token}`)
                 .send(submittedEntry)
                 .then((res) => {
-                    // compare our response to the object we created
+                    // Compare our response to the object we created:
                     res.should.have.status(201);
                     res.should.be.json;
                     res.body.should.include.keys('title', 'body', 'author');
                     res.body.title.should.equal(submittedEntry.title);
                     res.body.body.should.equal(submittedEntry.body);
                     res.body.author.should.equal(submittedEntry.author);
-                    // and now return the relevant database entry
-                    return Entries.findById(res.body.id);
+                    // And now return the relevant database entry:
+                    return Entry.findById(res.body.id);
                 })
                 .then((dbEntry) => {
                     dbEntry.title.should.equal(submittedEntry.title);
                     dbEntry.body.should.equal(submittedEntry.body);
-                    dbEntry.author.should.equal(username);
+                    dbEntry.author.should.equal(dataToSend.username);
                 });
         });
 
         describe('PUT endpoint :: /api/entries/:id', () => {
-            // strategy:
-            //  1. generate random data for the fields that we'll replace with
+            // Strategy:
+            //  1. Generate random data for the fields that we'll replace with
             //     our PUT request
-            //  2. find a(n arbitrary) journal entry in our database and
+            //  2. Find a(n arbitrary) journal entry in our database and
             //     extract the id
-            //  3. make a PUT request using the id above, and our new fields
+            //  3. Make a PUT request using the id above, and our new fields
             //  4. KEY: examine the response code and compare the new database
             //     record with the object we sent in our put request; fields
             //     should be the same in both
             it('should update the fields that we specify, in our entry', () => {
-                const updateData = {
-                    body: faker.lorem.paragraphs(10),
-                    title: faker.random.words()
-                };
+                // const updateData = {
+                //     body: faker.lorem.paragraphs(10),
+                //     title: faker.random.words()
+                // };
+                const updateData = generateEntry();
 
-                return Entries
+                return Entry
                     .findOne()
                     .exec()
                     .then((dbEntry) => {
-                        // body's id needs to equal /api/entries/:id
+                        // Body's id needs to equal /api/entries/:id
                         updateData.id = dbEntry.id;
 
                         return chai.request(app)
                             .put(`/api/entries/${dbEntry.id}`)
-                            .auth(username, password)
+                            .set('Authorization', `Bearer ${dataToSend.token}`)
                             .send(updateData);
                     })
                     .then((res) => {
                         res.should.have.status(201);
-                        // return our database record, for examination
+                        // Return our database record, for examination:
                         return Entry.findById(updateData.id).exec();
                     })
                     .then((dbEntry) => {
@@ -242,13 +189,13 @@ describe('Journal/notes entries API endpoints,', function() {
         });
 
         describe('DELETE endpoint :: /api/entries/:id', () => {
-            // strategy:
-            //  1. arbitrarily get a database record & extract its id
-            //  2. make DELETE request using this id
-            //  3. check response's status code and wee whether a record
+            // Strategy:
+            //  1. Arbitrarily get a database record & extract its id
+            //  2. Make DELETE request using this id
+            //  3. Check response's status code and wee whether a record
             //     with that id exists in our database
             let dbEntry;
-            return Entries
+            return Entry
                 .findOne()
                 .exec()
                 .then((_dbEntry) => {
@@ -256,16 +203,16 @@ describe('Journal/notes entries API endpoints,', function() {
                     // make request using our db entry's id
                     return chai.request(app)
                         .delete(`/api/entries/${dbEntry.id}`)
-                        .auth(username, password);
+                        .set('Authorization', `Bearer ${dataToSend.token}`);
                 })
                 .then((res) => {
                     res.should.have.status(204);
-                    // post DELETE, we'll try to find the submitted entry in
+                    // Post-DELETE, we'll try to find the submitted entry in
                     // our database \/
-                    return Entries.findById(dbEntry.id).exec();
+                    return Entry.findById(dbEntry.id).exec();
                 })
                 .then((allegedlyDeleted) => {
-                    // here's hoping that Entries.findById(...) doesn't exist
+                    // Here's hoping that Entry.findById(...) doesn't exist
                     should.not.exist(allegedlyDeleted);
                 });
         });

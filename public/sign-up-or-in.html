@@ -12,7 +12,13 @@
     <link href="https://fonts.googleapis.com/css?family=Manuale|Merriweather|Quicksand" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="style.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="splash-sign-up.css" type="text/css" media="screen"/>
-    <style>html,body{height:100%;}.container{height:100%;}</style>
+    <style>
+      html,body{height:100%;}.container{height:100%;}
+      a.h2{ cursor:pointer;display:inline-block;border-radius:3px;margin-right:3px;padding:7px;}
+      .sign-log-selected { background-color:#ffc864;transition:all 0.6s;}
+      a.h2:focus { color:#333;}
+      a.h2:hover { color:#333;}
+    </style>
   </head>
 
   <body id="sign-up">
@@ -22,7 +28,7 @@
           <ul class="nav nav-pills pull-right our-nav">
             <li class="headlinks"><a href="index.html">About</a></li>
             <li class="current headlinks"><a href="write-entry.html">Login</a></li>
-            <li class="headlinks"><a href="#">Contact</a></li>
+            <li class="headlinks"><a href="mailto:dan.rounds+JourNLP@gmail.com">Contact</a></li>
           </ul>
           <h2 class="project-name">JourNLP</h2>
         </div>
@@ -31,23 +37,24 @@
 
       <div class="row">
         <div class="text-center" style="padding:11px 0">
-	        <h2>sign up</h2>
+	        <a id="sign-up-h" class="h2" href="#sign-up"><h2>sign up</h2></a>
+          <a id="log-in-h" class="h2" href="#log-in"><h2>log in</h2></a>
         </div>
       </div>
 
 	    <div class="login-form-1">
-		    <form id="login-form" enctype="application/json">
+		    <form id="login" enctype="application/json">
 
           <div class="row row-centered">
             <div class="col-md-4 col-centered">
-              <p id="username-taken" class="text-center"></p>
+              <p id="username-taken" class="text-center"><br/></p>
             </div>
           </div>
 
           <div class="row row-centered">
             <div class="col-md-4 col-centered">
               <label for="username" class="sr-only">Username</label>
-					    <input type="text" class="form-control" id="username" name="lusername" placeholder="username" required autofocus>
+					    <input type="text" class="form-control" id="username" name="username" placeholder="username" required autofocus>
             </div>
           </div>
 
@@ -60,7 +67,7 @@
 
           <div class="row row-centered">
             <div class="col-md-4 col-centered">
-              <a id="signup-submit" class="btn btn-large btn-primary pull-right" href="#">do it!</a>
+              <a id="signup-login-submit" class="btn btn-large btn-primary pull-right" href="#">do it!</a>
             </div>
           </div>
 		    </form>

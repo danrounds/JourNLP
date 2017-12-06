@@ -1,6 +1,6 @@
 'use strict';
 
-var state, google, populateState, $, displayGlobalTags, logoutBind;
+var state, google, $, displayGlobalTags, logoutBind;
 
 // API calls
 function drawMap() {
@@ -66,7 +66,7 @@ function handleTree() {
 }
 
 $(function() {
-    populateState()
+    state.populateState()
         .done(function() {
             state.sortTags();
 
