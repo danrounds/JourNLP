@@ -5,7 +5,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 
-const { Entry, UserAccount } = require('../api');
+const { Entry } = require('../api');
 const { app, runServer, closeServer } = require('../server');
 const { TEST_DATABASE_URL, TEST_PORT } = require('../config');
 const { tearDownDb, seedDb } = require('./_setup');
@@ -27,9 +27,8 @@ describe('Journal/notes entries API endpoints,', function() {
     afterEach(() => tearDownDb());
     after(() => closeServer());
 
-
     describe('GET endpoint :: /api/entries/.*', () => {
-        // strategy:
+        // Strategy:
         //  1. GET journal entries (via server...and indirectly, our db)
         //  2. Check returned status # and data type of response
         //  3. Make sure returned entries's N equals the number of records we
@@ -42,7 +41,7 @@ describe('Journal/notes entries API endpoints,', function() {
                 .then((_res) => {
                     res = _res;
                     res.should.have.status(200);
-                    return Entry.count();
+                    return Entry.count(); // This is an async action
                 })
                 .then(count => { res.body.should.have.length.of(count); });
         });

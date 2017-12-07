@@ -31,7 +31,7 @@ function seedDb() {
                   return { token: _token, username, password, };
               }))
         .then(() => postEntries(username))
-        .then(() => ({ username, token }))
+        .then(() => ({ username, token, password }))
         .catch(err =>  console.warn(err));
 }
 
