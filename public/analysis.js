@@ -1,6 +1,6 @@
 'use strict';
 
-var state, google, $, displayGlobalTags, logoutBind;
+var state, google, $, displayGlobalTags, logoutBind, displayNotLoggedInDialog;
 
 // API calls
 function drawMap() {
@@ -53,6 +53,7 @@ function handleMap() {
         drawMap();
         $('#tree').removeClass('switched');
         $('#map').addClass('switched');
+        $('body').focus();
     });
 }
 
@@ -61,7 +62,7 @@ function handleTree() {
         drawTree();
         $('#map').removeClass('switched');
         $('#tree').addClass('switched');
-        // $('body').focus();
+        $('body').focus();
     });
 }
 
@@ -81,5 +82,6 @@ $(function() {
             google.charts.setOnLoadCallback(handleMap);
             google.charts.setOnLoadCallback(handleTree);
             google.charts.setOnLoadCallback(drawMap); // Our initial view
-        });
+        })
+        .then(displayNotLoggedInDialog);
 });

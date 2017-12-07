@@ -1,6 +1,6 @@
 'use strict';
 
-// state-oriented functions & data-structures
+// State-oriented functions & data-structures
 var state = {
     entries: [],
     current: null,
@@ -30,11 +30,14 @@ var state = {
             .done(function(data) {
                 state.entries = data;
                 state.resetCurrent();
+            })
+            .catch(function(err) {
+                if ([401, 500].indexOf(err.status) !== -1)
+                    state.clearState();
             });
     },
     resetCurrent: function() {
         state.current = state.entries[0];
-        state.author = state.entries[0].author;
     },
     setAuthor: function(value) {
         localStorage.setItem('@JNLP/author', value),
@@ -100,7 +103,6 @@ function submitSignUp(data) {
     return makeRequest('../api/user_account/', 'POST', data);
 }
 
-// function populateState() {
 function getEntries() {
     return makeRequest('../api/entries/', 'GET');
 }
@@ -370,9 +372,9 @@ function preventErasedComment() {
         var body =  $('#body-text').val().trim();
         var inputs = findById(getQueryString()) || { title: '', body: '' };
 
-        ans = true;
+        var ans = true;
         if (inputs.title !== title || inputs.body !== body) {
-            var ans = confirm(`Are you sure you want to discard your work?`);
+            ans = confirm(`Are you sure you want to discard your work?`);
         }
         ans && window.open($(this).attr('href'), '_self');
     });
@@ -393,7 +395,6 @@ function signUpLoginSetHeaders() {
         $('#log-in-h').addClass('sign-log-selected');
         $('#sign-up-h').removeClass('sign-log-selected');
     });
-
 }
 
 function signUpLoginForm() {
@@ -437,12 +438,14 @@ function signUpLoginForm() {
 }
 
 function logoutBind() {
-    $('a.logout-link')
-        .html(`${state.author}<br><em id=logout>logout</em>`)
-        .click(function(e) {
-            window.open(`sign-up-or-in.html#log-in`, '_self');
-            state.clearState();
-    });
+    if (state.author) {
+        $('a.logout-link')
+            .html(`${state.author}<br><em id=logout>logout</em>`)
+            .click(function(e) {
+                window.open(`sign-up-or-in.html#log-in`, '_self');
+                state.clearState();
+            });
+    }
 }
 
 function demoLogin() {
@@ -459,6 +462,13 @@ function demoLogin() {
     });
 }
 
+function displayNotLoggedInDialog() {
+    // This displays if we're trying to access pages that need API access, but
+    // we're not logged in
+    if (state.author === null)
+        $('body').append(`<a class="not-logged-in" href="sign-up-or-in.html#log-in">Please log in</a>`);
+}
+
 //// High-level functions for our different screens
 function viewEntryUpdate() {
     return state.populateState()
@@ -466,7 +476,8 @@ function viewEntryUpdate() {
         .then(updateEntriesSidebar)
         .then(updateEntryView)
         .then(updateTagsSidebar)
-        .then(logoutBind);
+        .then(logoutBind)
+        .then(displayNotLoggedInDialog);
 }
 
 function writeEntryUpdate() {
@@ -477,14 +488,16 @@ function writeEntryUpdate() {
         .then(writeEditDisplayMain)
         .then(writeEditButtons)
         .then(preventErasedComment)
-        .then(logoutBind);
+        .then(logoutBind)
+        .then(displayNotLoggedInDialog);
 }
 
 function listingsUpdate() {
     return state.populateState()
         .done(state.sortTags)
         .done(updateListingsView)
-        .then(logoutBind);
+        .then(logoutBind)
+        .then(displayNotLoggedInDialog);
 }
 
 function signUp() {

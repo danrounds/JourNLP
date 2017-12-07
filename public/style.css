@@ -215,6 +215,26 @@ em#logout {
     border-color: #900c3f !important;
 }
 
+.not-logged-in {
+    position: fixed; /* Stay in place */
+    left: 0;
+    top: -20px;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4);
+    color: #eec;
+    font-size: 70px;
+    height: 110%;
+    overflow: auto;
+    padding-top: 140px;
+    text-align: center;
+    width: 100%;
+    z-index: 1;
+}
+
+.not-logged-in:hover {
+    color: #eec;
+}
+
 /* Extra Small Devices, Phones */ 
 @media screen and (max-width: 1000px) {
     .sidebar {
