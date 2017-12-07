@@ -6,19 +6,17 @@ const cron = require('node-cron');
 
 const { resetDemoAccount } = require ('./bin/demo_account_refresh');
 const { DATABASE_URL, PORT } = require('./config');
+const { entriesRouter, accountRouter } = require('./api');
 
 // ES6-style promises for mongoose
 mongoose.Promise = global.Promise;
 
-const { router: apiRouter } = require('./api');
-
 const app = express();
 app.use(morgan('dev'), bodyParser.json());
-app.use(bodyParser.json());
 
 // Getting down to some actual serving:
 app.use(express.static('public')); // /public/ now serves static files
-app.use('/api/', apiRouter);
+app.use('/api/', entriesRouter, accountRouter);
 app.use('*', function(req, res) {
     res.status(404).json({message: 'Resource not found'});
 });
@@ -67,5 +65,5 @@ if (require.main === module) {
 module.exports = { runServer, closeServer, app };
 
 
-// Scheduled refresh of our demo account, once every 10 minutes
-cron.schedule('*/10 * * * *', () => resetDemoAccount(), null, false);
+// Scheduled refresh of our demo account, once every 20 minutes
+cron.schedule('*/20 * * * *', () => resetDemoAccount(), null, false);
