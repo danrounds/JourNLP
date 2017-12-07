@@ -20,7 +20,6 @@ function generateAccount() {
 }
 
 // Populates our database with plausible-seeming journal-entry data
-// function postEntries() {
 function postEntries(username) {
     console.log('Seeding notes/journal-entry db records');
 
@@ -33,7 +32,7 @@ function postEntries(username) {
                       .exec()
                       .then(user => {
                           user.posts.push(entry._id);
-                          user.save();
+                          return user.save();
                       })));
     }
     return Promise.all(dbQueries);
