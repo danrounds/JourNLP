@@ -7,7 +7,8 @@ _JourNLP_ is a journaling/note-taking web app that automatically categorizes you
 
 ## Platforms/libraries/frameworks used
 * Express/Node.js
-* [Passport](http://passportjs.org/), for authentication
+* [Passport](http://passportjs.org/) with [passport-jwt](https://github.com/themikenicholson/passport-jwt), for authentication
+* [jwt-simple](https://github.com/hokaccha/node-jwt-simple) for encoding/decoding our JWTs
 * [Retext](https://github.com/wooorm/retext/) with [retext-keywords](https://github.com/wooorm/retext-keywords), for our categorization
 * MongoDB, with [Mongoose](mongoosejs.com/) for schema, input validation, etc
 * [bcryptjs](https://www.npmjs.com/package/bcryptjs) for password hashing & salting
@@ -23,7 +24,7 @@ Sidebar patterns, courtesy [subtlepatterns.com](http://www.subtlepatterns.com) a
 
 ## API
 
-The API here is RESTful. Most access involves [basic authentication](https://www.httpwatch.com/httpgallery/authentication/); the lone exception is account creation (`POST /api/user_account`). All request/response bodies are of type `application/json`.
+The API here is RESTful. Most access involves authentication via [JWT](https://jwt.io/introduction/); the exceptions are account creation (`POST /api/user_account`) and log in (`POST /api/log_in`). All request/response bodies are of type `application/json`.
 
 The API endpoints for this project broadly do two things:
 
@@ -37,6 +38,12 @@ The API endpoints for this project broadly do two things:
 ---------------------------------------------------------------
 
 ## Screenshots
+
+**Splash page**
+
+![splash page](doc/splash.png)
+
+---------------------------------------------------------------
 
 **Write listings; JourNLP categorizes them**
 
