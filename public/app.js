@@ -14,7 +14,7 @@ var state = {
     // keys:   individual tags from nlpTopics, i.e. ...entry.nlpTopics[i]
     // values: arrays of `entries' that contained the given tag.
 
-    clearState: function() {
+    clearState() {
         localStorage.removeItem('@JNLP/author');
         localStorage.removeItem('@JNLP/authToken');
         state = {
@@ -25,7 +25,7 @@ var state = {
             globalTags: {}
         };
     },
-    populateState: function() {
+    populateState() {
         return getEntries()
             .done(function(data) {
                 state.entries = data;
@@ -36,18 +36,18 @@ var state = {
                     state.clearState();
             });
     },
-    resetCurrent: function() {
+    resetCurrent() {
         state.current = state.entries[0];
     },
-    setAuthor: function(value) {
+    setAuthor(value) {
         localStorage.setItem('@JNLP/author', value),
         state.author = value;
     },
-    setJwt: function(value) {
+    setJwt(value) {
         localStorage.setItem('@JNLP/authToken', value);
         state.jwtToken = value;
     },
-    sortTags: function() {
+    sortTags() {
         // This is the function that does the above mapping for us
         state.globalTags = {};
         state.entries.forEach(function(entry) {
@@ -62,7 +62,7 @@ var state = {
             });
         });
     },
-    updateState: function() {
+    updateState() {
         state.current = findById(getQueryString()) || state.current;
     }
 };
