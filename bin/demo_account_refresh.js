@@ -68,7 +68,6 @@ function resetDemoAccount() {
         .then(createDemoAccount)
         .then(jwt => {
             console.log('[bin/demo_account_refresh] :: Creating posts for `demo_account`...');
-            console.log(jwt);
             for (let post of data)
                 // Issues a POST for every entry in our `data`, below
                 postPost(jwt, post);
