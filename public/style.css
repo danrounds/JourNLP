@@ -81,9 +81,14 @@ textarea:focus {
     color: gray;
 }
 
-.project-name {
+.logo {
     color: #777;
     cursor: default;
+    user-select: none;
+}
+
+.logo a {
+    color: #777;
     font-family: 'Manuale', serif;
     font-size: 40px;
     font-weight: bold;
