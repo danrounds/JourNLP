@@ -67,10 +67,12 @@ function resetDemoAccount() {
     return dropDemoAccount()
         .then(createDemoAccount)
         .then(jwt => {
+            let additions = [];
             console.log('[bin/demo_account_refresh] :: Creating posts for `demo_account`...');
             for (let post of data)
                 // Issues a POST for every entry in our `data`, below
-                postPost(jwt, post);
+                additions.push(postPost(jwt, post));
+            return Promise.all(additions);
         })
         .then(() => console.log('[bin/demo_account_refresh] :: `demo_account` refreshed!'))
         .catch(err => console.log('[bin/demo_account_refresh] :: '+ err));

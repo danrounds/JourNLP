@@ -2,6 +2,7 @@
 
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+mongoose.plugin(schema => { schema.options.usePushEach = true });
 
 const notesEntrySchema = mongoose.Schema({
     title:{
@@ -26,7 +27,7 @@ const notesEntrySchema = mongoose.Schema({
     lastUpdateAt: {
         type: Date,
         default: null,
-    }
+    },
 });
 
 
@@ -99,4 +100,4 @@ userAccountSchema.methods.apiRepr = function() {
 const Entry = mongoose.model('Entry', notesEntrySchema);
 const UserAccount = mongoose.model('UserAccount', userAccountSchema);
 
-module.exports = {UserAccount, Entry};
+module.exports = { UserAccount, Entry };
