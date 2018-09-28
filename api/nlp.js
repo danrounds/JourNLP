@@ -40,28 +40,18 @@ const text =             /* First three paragraphs on Term Extraction from Wikip
           'semantic similarity, knowledge management, human translation ' +
           'and machine translation, etc.';
 
-// function test() {
-//     nlpCategorize(text)
-//         .then(out => console.log(out));
-// }
-
-// I implemented this with promises only for consistency of "interface"
 function nlpCategorize(text) {
     const nKeywords = Math.round( Math.log1p(text.length / 5.3 || 3 ));
-    return Promise.resolve(retext().use(keywords, {maximum: nKeywords}).process(text))
-        .then(file => {
-            const [keywords, keyphrases] = [[],[]]; 
-            file.data.keywords.forEach(keyword => {
-                keywords.push(nlcstToString(keyword.matches[0].node));
-            });
-            file.data.keyphrases.forEach(phrase => {
-                keyphrases.push(phrase.matches[0].nodes.map(nlcstToString).join(''));
-            });
+    // ^ A heuristic I made up, so that we don't end up with too many keywords:
 
-            if (!keyphrases.length) // keyphrases are nice, but if analysis
-                return keywords;    // doesn't give us any, we'll settle for
-            return keyphrases;      // keywords
-        });
+    const file = retext().use(keywords, { maximum: nKeywords }).process(text);
+    const [keyWords, keyPhrases] = [[], []];
+    file.data.keywords.forEach(keyword => keyWords.push(nlcstToString(keyword.matches[0].node)));
+    file.data.keyphrases.forEach(phrase => keyPhrases.push(phrase.matches[0].nodes.map(nlcstToString).join('')));
+
+    if (!keyPhrases.length) // keyphrases are nice, but if analysis
+        return keyWords;    // doesn't give us any, we'll settle for
+    return keyPhrases;      // keywords
 }
 
-module.exports = {nlpCategorize};
+module.exports = { nlpCategorize };
