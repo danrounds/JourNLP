@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const cron = require('node-cron');
+const Worker = require('tiny-worker');
+const PromiseWorker = require('promise-worker');
 
 const { resetDemoAccount } = require ('./bin/demo_account_refresh');
 const { DATABASE_URL, PORT } = require('./config');
@@ -11,14 +13,18 @@ const { entriesRouter, accountRouter } = require('./api');
 // ES6-style promises for mongoose
 mongoose.Promise = global.Promise;
 
+// Our worker thread for NLP processing. This gets sent to/used by our EntriesRouter
+const worker = new Worker('./nlp.js', { module: true });
+const nlpCategorizeD = new PromiseWorker(worker);
+
 const app = express();
-app.use(morgan('dev'), bodyParser.json());
+app.use(morgan('dev'), bodyParser.json()); // Logging
 
 // Getting down to some actual serving:
 app.use(express.static('public')); // /public/ now serves static files
-app.use('/api/', entriesRouter, accountRouter);
+app.use('/api/', entriesRouter(nlpCategorizeD), accountRouter);
 app.use('*', function(req, res) {
-    res.status(404).json({message: 'Resource not found'});
+    res.status(404).json({ message: 'Resource not found' });
 });
 
 let server;

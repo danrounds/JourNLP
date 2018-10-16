@@ -3,9 +3,8 @@
 
 // const {Entry} = require('./entry-model');
 const { Entry, UserAccount } = require('./models');
-const { entriesRouter } = require('./entriesRouter');
+const entriesRouter = require('./entriesRouter');
 const { accountRouter } = require('./accountRouter');
-const { nlpCategorize } = require('./nlp');
 
 module.exports =
-    { Entry, UserAccount, entriesRouter, accountRouter, nlpCategorize };
+    { Entry, UserAccount, entriesRouter, accountRouter, };

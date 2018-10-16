@@ -3,9 +3,11 @@ const entriesRouter = express.Router();
 const jwt = require('jwt-simple');
 
 const { UserAccount, Entry } = require('./models');
-const { nlpCategorize } = require('./nlp');
 const auth = require('./jwtAuthentication');
 const { isFieldMissing } = require('./commonFns');
+
+let nlpCategorizeD;             // Initialized by our exported function.
+// ^ Reminder that this is basically being run as a "daemon"
 
 // Our authentication
 entriesRouter.use(auth.initialize());
@@ -50,27 +52,27 @@ entriesRouter.post('/entries/', auth.authenticate(), (req, res) => {
 
     const title = req.body.title;
     const body = req.body.body;
-    const nlpTopics = nlpCategorize(title + '. ' + body);
+    return nlpCategorizeD.postMessage(title + '. ' + body)
+        .then(nlpTopics => Entry
+              .create({
+                  author: req.user.username,
+                  title,
+                  body,
+                  nlpTopics,
+              })
+              .then(entry => {
+                  UserAccount
+                      .findOne({ username: req.user.username })
+                      .exec()
+                      .then(user => {
+                          user.posts.push(entry._id);
+                          user.save();
+                      });
 
-    return Entry.create({
-        author: req.user.username,
-        title,
-        body,
-        nlpTopics,
-    })
-        .then(entry => {
-            UserAccount
-                .findOne({ username: req.user.username })
-                .exec()
-                .then(user => {
-                    user.posts.push(entry._id);
-                    user.save();
-                });
-
-            return entry;
-        })
-        .then(entry => res.status(201).json(entry.apiRepr()))
-        .catch(() => res.sendStatus(500));
+                  return entry;
+              })
+              .then(entry => res.status(201).json(entry.apiRepr()))
+              .catch(() => res.sendStatus(500)));
 });
 
 entriesRouter.put('/entries/:id', auth.authenticate(), (req, res) => {
@@ -93,17 +95,17 @@ entriesRouter.put('/entries/:id', auth.authenticate(), (req, res) => {
                 res.sendStatus(403); // 403: Forbidden
             return req.body.title || entry.title;
         })
-        .then(title => {
-            const nlpTopics = nlpCategorize(title + '. ' + req.body.body);
-            updated.nlpTopics = nlpTopics;
-            updated.lastUpdateAt = Date.now();
-            return Entry
-                .findByIdAndUpdate(req.params.id,
-                                   { $set: updated },
-                                   { new: true })
-                .exec()
-        })
-        .then(updatedPost => res.status(201).json(updatedPost.apiRepr()))
+        .then(title => nlpCategorizeD.postMessage(title + '. ' + req.body.body)
+              .then(nlpTopics => {
+                  updated.nlpTopics = nlpTopics;
+                  updated.lastUpdateAt = Date.now();
+                  return Entry
+                      .findByIdAndUpdate(req.params.id,
+                                         { $set: updated },
+                                         { new: true })
+                      .exec()
+                      .then(updatedPost => res.status(201).json(updatedPost.apiRepr()));
+              }))
         .catch(err => res.sendStatus(500));
 });
 
@@ -126,4 +128,7 @@ entriesRouter.get('/user_account/', auth.authenticate(), (req, res) => {
         .catch(err => res.sendStatus(500));
 });
 
-module.exports = { entriesRouter };
+module.exports = function initializer(nlpFn) {
+    nlpCategorizeD = nlpFn;
+    return entriesRouter;
+};
