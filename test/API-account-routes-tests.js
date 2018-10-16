@@ -5,7 +5,6 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const mongoose = require('mongoose');
 
 // const { Entry, UserAccount } = require('../api');
 const { app, runServer, closeServer } = require('../server');
@@ -22,7 +21,6 @@ const isBase64 = /^[A-Za-z0-9+/\-=_]+$/i;
 
 // Our actual tests
 describe('Journal/notes entries API endpoints,', function() {
-
     let dataToSend;
     this.timeout(5000);
 
@@ -37,33 +35,27 @@ describe('Journal/notes entries API endpoints,', function() {
         // 1. POST new user account { username, password }
         // 2. Check to see that our response looks like a three-field JWT,
         //    i.e. three period-separated base64-encoded strings
-        it('should return a JWT token', () => {
-            return chai.request(app)
-                .post('/api/user_account')
-                .send({ username: 'made-up-name-guy',
-                        password: '123fakestreet' })
-                .then(res => {
-                    const jwtTokenParts = res.body.split('.');
-                    jwtTokenParts.should.have.length(3);
-                    for (const part of jwtTokenParts) {
-                        isBase64.test(part).should.be.true;
-                    }
-                });
-        });
+        it('should return a JWT token', () => chai.request(app)
+           .post('/api/user_account')
+           .send({ username: 'made-up-name-guy',
+                   password: '123fakestreet' })
+           .then(res => {
+               const jwtTokenParts = res.body.split('.');
+               jwtTokenParts.should.have.length(3);
+               for (const part of jwtTokenParts) {
+                   isBase64.test(part).should.be.true;
+               }
+           }));
 
-        it('should fail if we forget a password', () => {
-            return chai.request(app)
-                .post('/api/user_account')
-                .send({ username: 'made-up-name-guy' })
-                .catch(res => res.should.have.status(400));
-        });
+        it('should fail if we forget a password', () => chai.request(app)
+           .post('/api/user_account')
+           .send({ username: 'made-up-name-guy' })
+           .catch(res => res.should.have.status(400)));
 
-        it('should fail if we forget a username', () => {
-            return chai.request(app)
-                .post('/api/user_account')
-                .send({ password: 'abc123' })
-                .catch(res => res.should.have.status(400));
-        });
+        it('should fail if we forget a username', () => chai.request(app)
+           .post('/api/user_account')
+           .send({ password: 'abc123' })
+           .catch(res => res.should.have.status(400)));
     });
 
     describe('POST endpoint :: /api/log_in/', () => {

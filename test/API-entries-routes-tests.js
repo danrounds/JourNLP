@@ -3,7 +3,6 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const mongoose = require('mongoose');
 
 const { Entry } = require('../api');
 const { app, runServer, closeServer } = require('../server');
@@ -17,7 +16,6 @@ chai.use(chaiHttp);
 
 // Our actual tests
 describe('Journal/notes entries API endpoints,', function() {
-
     let dataToSend;
     this.timeout(5000);
 
@@ -106,6 +104,7 @@ describe('Journal/notes entries API endpoints,', function() {
                     entry.nlpTopics.join().should.equal(record.nlpTopics.join());
                 });
         });
+
         it('should fail on bad authorization', () => chai.request(app)
            .get('/accounts')
            .set('Authorization', `Bearer ${dataToSend.token+123}`) // bad token
@@ -193,27 +192,29 @@ describe('Journal/notes entries API endpoints,', function() {
             //  2. Make DELETE request using this id
             //  3. Check response's status code and wee whether a record
             //     with that id exists in our database
-            let dbEntry;
-            return Entry
-                .findOne()
-                .exec()
-                .then((_dbEntry) => {
-                    dbEntry = _dbEntry;
-                    // make request using our db entry's id
-                    return chai.request(app)
-                        .delete(`/api/entries/${dbEntry.id}`)
-                        .set('Authorization', `Bearer ${dataToSend.token}`);
-                })
-                .then((res) => {
-                    res.should.have.status(204);
-                    // Post-DELETE, we'll try to find the submitted entry in
-                    // our database \/
-                    return Entry.findById(dbEntry.id).exec();
-                })
-                .then((allegedlyDeleted) => {
-                    // Here's hoping that Entry.findById(...) doesn't exist
-                    should.not.exist(allegedlyDeleted);
-                });
+            it('should delete records upon DELETE request', () => {
+                let dbEntry;
+                return Entry
+                    .findOne()
+                    .exec()
+                    .then((_dbEntry) => {
+                        dbEntry = _dbEntry;
+                        // Make request using our db entry's id
+                        return chai.request(app)
+                            .delete(`/api/entries/${dbEntry.id}`)
+                            .set('Authorization', `Bearer ${dataToSend.token}`);
+                    })
+                    .then((res) => {
+                        res.should.have.status(204);
+                        // Post-DELETE, we'll try to find the submitted entry in
+                        // our database \/
+                        return Entry.findById(dbEntry.id).exec();
+                    })
+                    .then((allegedlyDeleted) => {
+                        // Here's hoping that Entry.findById(...) doesn't exist
+                        should.not.exist(allegedlyDeleted);
+                    });
+            });
         });
-    });        
+    });
 });
