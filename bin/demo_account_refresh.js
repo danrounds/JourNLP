@@ -11,13 +11,11 @@
 // on IP, and then have a nightly cron job to delete them. This is good enough,
 // for now, though.
 
-const { http } = require('http');
 const request = require('request-promise');
-const mongoose = require('mongoose');
 
 const { UserAccount, Entry } = require('../api');
 const [ UserAccounts, Entries ] = [ UserAccount, Entry ];
-const { PORT, DATABASE_URL } = require('../config');
+const { PORT } = require('../config');
 const { data } = require('./data');
 
 const username = 'demo_account';

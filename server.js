@@ -6,7 +6,7 @@ const cron = require('node-cron');
 const Worker = require('tiny-worker');
 const PromiseWorker = require('promise-worker');
 
-const { resetDemoAccount } = require ('./bin/demo_account_refresh');
+const { resetDemoAccount } = require('./bin/demo_account_refresh');
 const { DATABASE_URL, PORT } = require('./config');
 const { entriesRouter, accountRouter } = require('./api');
 

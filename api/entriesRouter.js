@@ -1,6 +1,5 @@
 const express = require('express');
 const entriesRouter = express.Router();
-const jwt = require('jwt-simple');
 
 const { UserAccount, Entry } = require('./models');
 const auth = require('./jwtAuthentication');
@@ -25,7 +24,7 @@ entriesRouter.get('/entries/', auth.authenticate(), (req, res) => {
             entries = entries.posts.reverse();
             return res.json(entries.map(entry => entry.apiRepr()));
         })
-        .catch(err => res.sendStatus(500));
+        .catch(() => res.sendStatus(500));
 });
 
 entriesRouter.get('/entries/:id', auth.authenticate(), (req, res) => {
@@ -40,7 +39,7 @@ entriesRouter.get('/entries/:id', auth.authenticate(), (req, res) => {
             else
                 return res.sendStatus(403);
         })
-        .catch(err => res.sendStatus(500));
+        .catch(() => res.sendStatus(500));
 });
 
 entriesRouter.post('/entries/', auth.authenticate(), (req, res) => {
@@ -106,7 +105,7 @@ entriesRouter.put('/entries/:id', auth.authenticate(), (req, res) => {
                       .exec()
                       .then(updatedPost => res.status(201).json(updatedPost.apiRepr()));
               }))
-        .catch(err => res.sendStatus(500));
+        .catch(() => res.sendStatus(500));
 });
 
 entriesRouter.delete('/entries/:id', auth.authenticate(), (req, res) => {
@@ -115,7 +114,7 @@ entriesRouter.delete('/entries/:id', auth.authenticate(), (req, res) => {
         .findByIdAndRemove(req.params.id)
         .exec()
         .then(() => res.sendStatus(204))
-        .catch(err => res.sendStatus(500));
+        .catch(() => res.sendStatus(500));
 });
 
 // /user_account/ endpoints
@@ -125,7 +124,7 @@ entriesRouter.get('/user_account/', auth.authenticate(), (req, res) => {
         .findOne({ username: req.user.username })
         .populate('posts')
         .then(userData => res.json(userData.apiRepr()))
-        .catch(err => res.sendStatus(500));
+        .catch(() => res.sendStatus(500));
 });
 
 module.exports = function initializer(nlpFn) {

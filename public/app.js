@@ -4,8 +4,8 @@
 var state = {
     entries: [],
     current: null,
-    author: localStorage.getItem('@JNLP/author'),
-    jwtToken: localStorage.getItem('@JNLP/authToken'),
+    author: window.localStorage.getItem('@JNLP/author'),
+    jwtToken: window.localStorage.getItem('@JNLP/authToken'),
     globalTags: {},
     // This lets us map from tagged topics back to the posts that were tagged
     // with them. The rationale here is that we can group together common tags.
@@ -15,8 +15,8 @@ var state = {
     // values: arrays of `entries' that contained the given tag.
 
     clearState() {
-        localStorage.removeItem('@JNLP/author');
-        localStorage.removeItem('@JNLP/authToken');
+        window.localStorage.removeItem('@JNLP/author');
+        window.localStorage.removeItem('@JNLP/authToken');
         state = {
             entries: [],
             current: null,
@@ -40,11 +40,11 @@ var state = {
         state.current = state.entries[0];
     },
     setAuthor(value) {
-        localStorage.setItem('@JNLP/author', value),
+        window.localStorage.setItem('@JNLP/author', value),
         state.author = value;
     },
     setJwt(value) {
-        localStorage.setItem('@JNLP/authToken', value);
+        window.localStorage.setItem('@JNLP/authToken', value);
         state.jwtToken = value;
     },
     sortTags() {
@@ -189,7 +189,7 @@ function addListingsButtonsProperties(id, title) {
 
 function displayGlobalTags() {
     // listings.html, subordinate
-    var tagsHtml = ''; var tagsArray = [];
+    var tagsArray = [];
     for (var tagEntry in state.globalTags) {
         tagsArray.push(`<a href="listings.html?${encodeURIComponent(tagEntry)}`
                        +`">${tagEntry}</a>`);
@@ -406,7 +406,7 @@ function signUpLoginForm() {
         if (e.which === 13)
             submitButton(e);
     });
-    function submitButton(e) {
+    function submitButton() {
         var username = $('#username').val().trim();
         var password = $('#password').val().trim();
 
@@ -441,7 +441,7 @@ function logoutBind() {
     if (state.author) {
         $('a.logout-link')
             .html(`${state.author}<br><em id=logout>logout</em>`)
-            .click(function(e) {
+            .click(function() {
                 window.open(`sign-up-or-in.html#log-in`, '_self');
                 state.clearState();
             });
@@ -505,10 +505,10 @@ function signUp() {
 }
 
 function dispatch() {
-    if ($('body#view-entry').length)  { viewEntryUpdate(); };
-    if ($('body#write-entry').length) { writeEntryUpdate(); };
-    if ($('body#listings').length)    { listingsUpdate(); };
-    if ($('body#sign-up').length)     { signUp(); };
+    if ($('body#view-entry').length)  { viewEntryUpdate(); }
+    if ($('body#write-entry').length) { writeEntryUpdate(); }
+    if ($('body#listings').length)    { listingsUpdate(); }
+    if ($('body#sign-up').length)     { signUp(); }
     if ($('body#index'.length))       { demoLogin(); }
 }
 

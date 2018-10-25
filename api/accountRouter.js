@@ -17,7 +17,7 @@ accountRouter.get('/user_account/', auth.authenticate(), (req, res) => {
         .findOne({ username: req.user.username })
         .populate('posts')
         .then(userData => res.json(userData.apiRepr()))
-        .catch(err => res.sendStatus(500));
+        .catch(() => res.sendStatus(500));
 });
 
 accountRouter.post('/log_in', (req, res) => {
@@ -90,8 +90,8 @@ accountRouter.put('/user_account/', auth.authenticate(), (req, res) => {
                   { $set: { 'password': hashed }},
                   { runValidators: true }
               )
-              .then(updated => res.sendStatus(204))
-              .catch(err => res.sendStatus(500)));
+              .then(() => res.sendStatus(204))
+              .catch(() => res.sendStatus(500)));
 });
 
 accountRouter.delete('/user_account/', auth.authenticate(), (req, res) => {
@@ -99,7 +99,7 @@ accountRouter.delete('/user_account/', auth.authenticate(), (req, res) => {
     return Promise.all([ Entry.remove({ author: req.user.username }).exec(),
                          UserAccount.remove({ username: req.user.username }).exec() ])
         .then(() => res.sendStatus(204)) // Success!
-        .catch(err => res.sendStatus(500));
+        .catch(() => res.sendStatus(500));
 });
 
 module.exports = { accountRouter };
