@@ -1,7 +1,5 @@
-const chai = require('chai');
 const mongoose = require('mongoose');
 const jwt = require('jwt-simple');
-const faker = require('faker');
 
 const { UserAccount } = require('../api');
 const { generateAccount, postEntries } = require('./_fake');

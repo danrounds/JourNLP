@@ -11,8 +11,6 @@ const { app, runServer, closeServer } = require('../server');
 const { TEST_DATABASE_URL, TEST_PORT } = require('../config');
 const { tearDownDb, seedDb } = require('./_setup');
 
-// Lets us use THING.should.have/THING.should.be-style constructs
-const should = chai.should();
 chai.use(chaiHttp);
 
 const isBase64 = /^[A-Za-z0-9+/\-=_]+$/i;

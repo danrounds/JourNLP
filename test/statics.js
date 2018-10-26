@@ -4,8 +4,6 @@ const chaiHttp = require('chai-http');
 const { TEST_DATABASE_URL, TEST_PORT } = require('../config');
 const { app, runServer, closeServer } = require('../server');
 
-// lets us use THING.should.have/THING.should.be-style constructs
-const should = chai.should();
 chai.use(chaiHttp);
 
 describe('Pages', function() {
