@@ -1,4 +1,11 @@
 language: node_js
 node_js: node
 services:
-  - mongodb
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: NHoGOnhCAWn7b6azhoT3lQSHNEkVO+UgxH6695U2tWyD30GGK4/+BSFnipHJtvd+f5o5vabU27Hr/jcM7fYOHzEL57GBUmZGYMO320mvA4lcZ1bEUSl50TDQs1MpkwELhfcgjYjXPYiL/lllaERsUQ39FH3hdFJcaLmZUL6lEqseiGomLLwFQi/CpdXGt0p6bm7rO4rAwu6qAvf+b8tjngvJ3VscvDGWXuuw1bhSG7GOwYHzpt1OoAh3te41Co+2KC4QJWpUPm/Ke5TMhfioMwBZUB7i28C/0PBZvrFELdWQ8hfZM9n4TQyHDVuu8VFHHYZJuHmEMXUnPmwRxuGv6so8S0LQmqsTLMG01a4CwhRpSfh+SIoR/QNO8vnMMZsi4wCWJiH+duUT/4qvCsqo9S+9pl4N4zX0Nsg6d83PTo+saMQ6eCwUIUm7DXRN1vhdJ12Mhxk9d7lBO8GaxUsL+gOPhSPmA7B2vPRHfAPmHe4pNZaj0sLArxB2a9EjsULCpgfbGoS0j/JcW2wz3tBW56/U1sP1Tzend/1pcWds0ubYoszhG+FcgO1m5QPGDqpL/0S//pZLmg0I88mWPqfhnGNbU8ujVmWFBlOuZhHpIHbXoQsSRTOZtlGZlDfR3YDZueGZsHBSPJ5VoY/QbABM8LqbtgnAiEO3C7QfXmjPae4=
+  app: jour-nlp
+  on:
+    repo: danrounds/JourNLP
