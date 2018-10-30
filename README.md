@@ -10,7 +10,7 @@ _JourNLP_ is a journaling/note-taking web app that automatically categorizes you
 * [Passport](http://passportjs.org/) with [passport-jwt](https://github.com/themikenicholson/passport-jwt), for authentication
 * [jwt-simple](https://github.com/hokaccha/node-jwt-simple) for encoding/decoding our JWTs
 * [Retext](https://github.com/wooorm/retext/) with [retext-keywords](https://github.com/wooorm/retext-keywords), for our categorization
-* [WebWorker Threads](https://www.npmjs.com/package/webworker-threads) and (promise-worker)[https://github.com/nolanlawson/promise-worker], for future-proof threading of our NLP
+* [WebWorker Threads](https://www.npmjs.com/package/webworker-threads) and [promise-worker](https://github.com/nolanlawson/promise-worker), for future-proof threading of our NLP
 * MongoDB, with [Mongoose](mongoosejs.com/) for schema, input validation, etc
 * [bcryptjs](https://www.npmjs.com/package/bcryptjs) for password hashing & salting
 * Mocha and Chai, for our tests
