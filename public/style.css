@@ -11,8 +11,8 @@ body {
 }
 
 .container {
-    background-color: white;
-    box-shadow: 1px 14px 18px 3px black;
+    background-color: #fffffd;
+    box-shadow: 1px -1px 18px 3px black;
 }
 
 :hover {
