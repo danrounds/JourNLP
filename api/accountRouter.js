@@ -56,25 +56,26 @@ accountRouter.post('/user_account/', (req, res) => {
         .then(exists => {
             if (exists)
                 return res.sendStatus(409); // name conflict
-        })
-        .then(() => UserAccount.hashPassword(req.body.password)
-              .then(hashed => UserAccount
-                    .create({
-                        username: req.body.username,
-                        password: hashed
-                    })
-                    .then(userAccount => {
-                        const payload = { id: userAccount._id, username: userAccount.username };
-                        const token = jwt.encode(payload, cfg.JWT_SECRET);
-                        return res.status(201).json(token);
-                    })
-                    .catch(err => {
-                        if (err.name == 'ValidationError')
-                            res.status(422).json({ message: err.errors.username.message });
-                        else
-                            // I'm not sure I want the server exposing whether accounts exist
-                            res.sendStatus(500);
-                    })));
+            else
+                UserAccount.hashPassword(req.body.password)
+                .then(hashed => UserAccount
+                      .create({
+                          username: req.body.username,
+                          password: hashed
+                      })
+                      .then(userAccount => {
+                          const payload = { id: userAccount._id, username: userAccount.username };
+                          const token = jwt.encode(payload, cfg.JWT_SECRET);
+                          return res.status(201).json(token);
+                      })
+                      .catch(err => {
+                          if (err.name == 'ValidationError')
+                              res.status(422).json({ message: err.errors.username.message });
+                          else
+                              // I'm not sure I want the server exposing whether accounts exist
+                              res.sendStatus(500);
+                      }))
+        });
 });
 
 accountRouter.put('/user_account/', auth.authenticate(), (req, res) => {
