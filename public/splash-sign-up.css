@@ -1,3 +1,9 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    padding: 0;
+}
+
 .row-centered {
     text-align:center;
 }
@@ -104,7 +110,26 @@ em {
     margin-bottom: 25px;
 }
 
-.footer-fixed {
-    bottom: 0;
-    position: absolute;
+.githubImg {
+    display: inline;
+    align-content: right;
+    height: 30px;
+    margin-top: -2px;
+}
+
+.githubLink {
+    display: inline;
+    color: #333;
+    float: right;
+    margin-top: -2px;
+    text-decoration: none;
+    text-align: right;
+    font-weight: bold !important;
+    padding-right: 4px;
+    white-space: nowrap;
+}
+
+.footer-link:hover {
+    color: #333;
+    opacity: 0.7;
 }
