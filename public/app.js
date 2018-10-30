@@ -83,16 +83,24 @@ function findByIdAndRemove(id) {
 }
 
 //// API-access functions
-function makeRequest(url, httpVerb, data) {
+function makeRequest(url, httpVerb, data, calledNTimes=0) {
     return $.ajax({
         url: url,
         type: httpVerb,
         headers: {
             'Authorization': 'Bearer '+ state.jwtToken,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        data: JSON.stringify(data)
-    });
+        data: JSON.stringify(data),
+    })
+        .catch(function(err) {
+            // Simple retry function--just retries on some types of failure
+            if (calledNTimes < 4 && ![401, 404, 409].includes(err.status))
+                return makeRequest(url, httpVerb, data, ++calledNTimes);
+            else
+                throw Promise.reject(err);
+        })
+        .catch(err => err);
 }
 
 function submitLogIn(data) {
@@ -272,8 +280,8 @@ function updateEntryView() {
         $('a#delete-link').click(function(e) {
             e.preventDefault();
             if (confirm(`Are you sure you want to delete ${state.current.title}?`)){
-                deleteEntry(state.current.id);
-                window.open('view-entry.html', '_self');
+                deleteEntry(state.current.id)
+                    .then(function() { window.open('view-entry.html', '_self'); });
             }
         });
     }
@@ -336,8 +344,8 @@ function writeEditButtons() {
         else {                  // we have an actual entry to submit
             var id = getQueryString();
             if (getQueryString()) {
-                editEntry({id: id, title: title, body: body});
-                window.open(`view-entry.html?${id}`, '_self');
+                editEntry({id: id, title: title, body: body})
+                    .then(function() { window.open(`view-entry.html?${id}`, '_self'); });
             } else {
                 submitEntry({title: title, body: body})
                     .done(function(res) {
@@ -354,8 +362,8 @@ function writeEditButtons() {
         var id = getQueryString();
         if (findById(id)) {
             if (confirm(`Are you sure you want to delete ${state.current.title}?`)){
-                deleteEntry(id);
-                window.open('write-entry.html', '_self');
+                deleteEntry(id)
+                    .then(function() { window.open('write-entry.html', '_self'); });
             }
         }
     });
