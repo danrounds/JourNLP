@@ -50,13 +50,10 @@ function nlpCategorize(text=text_) {
     // ^ A heuristic I made up, so that we don't end up with too many keywords:
 
     const file = retext().use(keywords, { maximum: nKeywords }).process(text);
-    const [keyWords, keyPhrases] = [[], []];
-    file.data.keywords.forEach(keyword => keyWords.push(nlcstToString(keyword.matches[0].node)));
-    file.data.keyphrases.forEach(phrase => keyPhrases.push(phrase.matches[0].nodes.map(nlcstToString).join('')));
+    const keyWords = file.data.keywords.map(keyword => nlcstToString(keyword.matches[0].node));
+    const keyPhrases = file.data.keyphrases.map(phrase => phrase.matches[0].nodes.map(nlcstToString).join(''));
 
-    if (!keyPhrases.length) // keyphrases are nice, but if analysis
-        return keyWords;    // doesn't give us any, we'll settle for
-    return keyPhrases;      // keywords
+    return keyPhrases.length ? keyPhrases : keyWords;
 }
 
 registerPromiseWorker(function(text) {
